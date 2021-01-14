@@ -1,0 +1,127 @@
+# A dedicated suite of tests to making sure that all cases produced expected rendering related to whitespace chomping etc.
+# see https://helm.sh/docs/chart_template_guide/#controlling-whitespace
+---
+suite: deployment test for conditional whitespace scenarios
+templates:
+  - deployment.yaml
+tests:
+  - it: should rendered deployment correctly with no hostname set, no service account, no containers/init containers, and sql cluster disabled (defaults)
+    asserts:
+      - template: deployment.yaml
+        isEmpty:
+          path: spec.template.spec.containers
+  - it: should rendered deployment correctly with hostname set, no service account, no containers/init containers, and sql cluster disabled
+    set:
+      hostname: "custom_hostname"
+    asserts:
+      - template: deployment.yaml
+        equal:
+          path: spec.template.spec.hostname
+          value: "custom_hostname"
+  - it: should rendered deployment correctly with hostname set, service account set, no init containers, and sql cluster disabled
+    set:
+      hostname: "custom_hostname"
+      serviceAccountName: "custom_service_account"
+    asserts:
+      - template: deployment.yaml
+        equal:
+          path: spec.template.spec.hostname
+          value: "custom_hostname"
+      - template: deployment.yaml
+        equal:
+          path: spec.template.spec.serviceAccountName
+          value: "custom_service_account"
+  - it: should rendered deployment correctly with hostname set, service account set, init containers defined, and sql cluster disabled
+    set:
+      hostname: "custom_hostname"
+      serviceAccountName: "custom_service_account"
+      initContainers:
+        init:
+          name: init
+          image:
+            repository: cache/busybox
+            tag: latest
+            pullPolicy: "IfNotPresent"
+          command: ['sh', '-c']
+    asserts:
+      - template: deployment.yaml
+        equal:
+          path: spec.template.spec.hostname
+          value: "custom_hostname"
+      - template: deployment.yaml
+        equal:
+          path: spec.template.spec.serviceAccountName
+          value: "custom_service_account"
+      - template: deployment.yaml
+        isNotEmpty:
+          path: spec.template.spec.initContainers
+  - it: should rendered deployment correctly with hostname set, service account set, init containers defined, and sql cluster enabled
+    set:
+      hostname: "custom_hostname"
+      serviceAccountName: "custom_service_account"
+      initContainers:
+        init:
+          name: init
+          image:
+            repository: cache/busybox
+            tag: latest
+            pullPolicy: "IfNotPresent"
+          command: ['sh', '-c']
+      sqlCluster.enabled: true
+    asserts:
+      - template: deployment.yaml
+        equal:
+          path: spec.template.spec.hostname
+          value: "custom_hostname"
+      - template: deployment.yaml
+        equal:
+          path: spec.template.spec.serviceAccountName
+          value: "custom_service_account"
+      - template: deployment.yaml
+        isNotEmpty:
+          path: spec.template.spec.initContainers
+  - it: should rendered deployment correctly with hostname set, service account set, init containers defined, and sql cluster enabled
+    set:
+      hostname: "custom_hostname"
+      serviceAccountName: "custom_service_account"
+      sqlCluster.enabled: true
+    asserts:
+      - template: deployment.yaml
+        equal:
+          path: spec.template.spec.hostname
+          value: "custom_hostname"
+      - template: deployment.yaml
+        equal:
+          path: spec.template.spec.serviceAccountName
+          value: "custom_service_account"
+      - template: deployment.yaml
+        isNotEmpty: # enabled postgres ensures an init container
+          path: spec.template.spec.initContainers
+  - it: should rendered deployment correctly with hostname set, no service account set, init containers defined, and sql cluster enabled
+    set:
+      hostname: "custom_hostname"
+      sqlCluster.enabled: true
+    asserts:
+      - template: deployment.yaml
+        equal:
+          path: spec.template.spec.hostname
+          value: "custom_hostname"
+      - template: deployment.yaml
+        isNotNull:
+          path: spec.template.spec.serviceAccountName
+      - template: deployment.yaml
+        isNotEmpty: # enabled postgres ensures an init container
+          path: spec.template.spec.initContainers
+  - it: should rendered deployment correctly with no hostname set, no service account set, init containers defined, and sql cluster enabled
+    set:
+      sqlCluster.enabled: true
+    asserts:
+      - template: deployment.yaml
+        isNull:
+          path: spec.template.spec.hostname
+      - template: deployment.yaml
+        isNotNull:
+          path: spec.template.spec.serviceAccountName
+      - template: deployment.yaml
+        isNotEmpty: # enabled postgres ensures an init container
+          path: spec.template.spec.initContainers

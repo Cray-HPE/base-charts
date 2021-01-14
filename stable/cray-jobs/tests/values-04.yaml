@@ -1,0 +1,11 @@
+jobs:
+  job01:
+    annotations:
+      helm.sh/hook: "pre-install,pre-upgrade"
+    template:
+      spec:
+        containers:
+          container01:
+            image:
+              repository: job01
+              tag: 0.0.1

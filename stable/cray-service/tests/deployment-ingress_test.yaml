@@ -1,0 +1,42 @@
+---
+suite: deployment ingress test
+templates:
+  - ingress.yaml
+tests:
+  - it: should render ingress
+    set:
+      ingress.enabled: true
+    asserts:
+      - template: ingress.yaml
+        hasDocuments:
+          count: 1
+  - it: should render shortName values correctly
+    set:
+      ingress.enabled: true
+      ingress.ui: false
+      nameOverride: cray-my-service
+    asserts:
+      - template: ingress.yaml
+        equal:
+          path: spec.http[0].match[0].uri.prefix
+          value: /apis/RELEASE-NAME-my-service
+      - template: ingress.yaml
+        equal:
+          path: spec.http[0].rewrite.uri
+          value: /api
+  - it: should render regex values without trailing slash
+    set:
+      ingress.enabled: true
+      ingress.regex: /vcs
+    asserts:
+      - matchRegex:
+          path: spec.http[0].match[0].uri.regex
+          pattern: ^/.*\/?$
+  - it: should render regex values with trailing slash
+    set:
+      ingress.enabled: true
+      ingress.regex: /vcs/
+    asserts:
+      - matchRegex:
+          path: spec.http[0].match[0].uri.regex
+          pattern: ^/.*\/?$

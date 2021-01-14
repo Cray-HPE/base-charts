@@ -1,0 +1,163 @@
+{{- if .Values.sqlCluster.enabled -}}
+{{- $root := . -}}
+{{- if .Values.sqlCluster.tls.enabled -}}
+---
+apiVersion: cert-manager.io/v1alpha2
+kind: Certificate
+metadata:
+  name: "{{ include "cray-service.fullname" $root }}-postgres-tls"
+spec:
+  secretName: "{{ include "cray-service.fullname" $root }}-postgres-tls"
+  duration: 720h
+  renewBefore: 24h
+  organization:
+    - Cray
+  commonName: "{{ include "cray-service.fullname" $root }}-postgres.{{ .Release.Namespace }}.cluster.svc"
+  isCA: false
+  keySize: 2048
+  keyAlgorithm: rsa
+  keyEncoding: pkcs1
+  usages:
+    - server auth
+    - client auth
+  dnsNames:
+    - "{{ include "cray-service.fullname" $root }}-postgres.{{ .Release.Namespace }}.cluster.svc"
+    - "{{ include "cray-service.fullname" $root }}-postgres.{{ .Release.Namespace }}"
+    - "*.{{ include "cray-service.fullname" $root }}-postgres.{{ .Release.Namespace }}"
+  issuerRef:
+    name: "{{ .Values.sqlCluster.tls.issuer }}"
+    kind: Issuer
+{{ end }}
+---
+apiVersion: "acid.zalan.do/v1"
+kind: postgresql
+metadata:
+  name: "{{ include "cray-service.fullname" . }}-postgres"
+  labels:
+    app.kubernetes.io/name: {{ include "cray-service.fullname" . }}-postgres
+    {{- include "cray-service.common-labels" . | nindent 4 }}
+    {{- with .Values.sqlCluster.labels -}}
+    {{ toYaml . | nindent 4 -}}
+    {{- end }}
+spec:
+  teamId: "{{ include "cray-service.fullname" . }}"
+  volume:
+    size: {{ .Values.sqlCluster.volumeSize }}
+  numberOfInstances: {{ .Values.sqlCluster.instanceCount }}
+  {{- if .Values.sqlCluster.resources }}
+  {{- with .Values.sqlCluster.resources }}
+  resources:
+    {{- toYaml . | nindent 4 }}
+  {{- end -}}
+  {{- end }}
+  users:
+    {{- with .Values.sqlCluster.users -}}
+    {{ toYaml . | nindent 4 -}}
+    {{- end }}
+  databases:
+    {{- with .Values.sqlCluster.databases -}}
+    {{ toYaml . | nindent 4 -}}
+    {{- end }}
+
+  postgresql:
+    version: {{ .Values.sqlCluster.postgresVersion | default "11" | quote }}
+    {{- if .Values.sqlCluster.parameters }}
+    {{- with .Values.sqlCluster.parameters }}
+    parameters:
+      {{- toYaml . | nindent 6 }}
+    {{- end -}}
+    {{- end }}
+
+{{- if .Values.sqlCluster.tls.enabled }}
+
+  tls:
+    secretName: "{{ include "cray-service.fullname" $root }}-postgres-tls"
+{{- end }}
+{{ range $i, $e := until (int .Values.sqlCluster.instanceCount) }}
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: "{{ include "cray-service.fullname" $root }}-postgres-{{ $e }}"
+  labels:
+    cluster-name: "{{ include "cray-service.fullname" $root }}"
+    role: pod
+spec:
+  selector:
+    statefulset.kubernetes.io/pod-name: "{{ include "cray-service.fullname" $root }}-postgres-{{$e}}"
+  ports:
+    - protocol: TCP
+      port: 5432
+      targetPort: 5432
+{{ end }}
+---
+apiVersion: "security.istio.io/v1beta1"
+kind: "PeerAuthentication"
+metadata:
+  name: "{{ include "cray-service.fullname" $root }}-postgres-pods"
+spec:
+  selector:
+    matchLabels:
+      cluster-name: "{{ include "cray-service.fullname" $root }}"
+      role: pod
+  portLevelMtls:
+    5432:
+      mode: PERMISSIVE
+---
+apiVersion: "security.istio.io/v1beta1"
+kind: "PeerAuthentication"
+metadata:
+  name: "{{ include "cray-service.fullname" $root }}-postgres"
+spec:
+  selector:
+    matchLabels:
+      application: spilo
+      cluster-name: "{{ include "cray-service.fullname" $root }}-postgres"
+      team: "{{ include "cray-service.fullname" $root }}"
+  portLevelMtls:
+    5432:
+      mode: PERMISSIVE
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: "{{ include "cray-service.fullname" . }}-wait-for-postgres-{{ .Release.Revision }}"
+  labels:
+    app.kubernetes.io/name: {{ include "cray-service.fullname" . }}-wait-for-postgres
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        {{- range .Values.sqlCluster.databases | keys }}
+        {{- $database := . }}
+        {{- $user := index $root.Values.sqlCluster.databases $database }}
+        - name: "postgres-watcher-{{ $database | replace "_" "-" }}"
+          image: "{{ include "cray-service.image-prefix" $root.Values }}cache/postgres:10.3"
+          command: ["sh", "-c", "until psql postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@$POSTGRES_HOST:$POSTGRES_PORT/$POSTGRES_DB -c 'select version();'; do echo waiting for postgres db $POSTGRES_DB; sleep 2; done;  echo 'POSTGRES_READY';"]
+          env:
+          - name: POSTGRES_USER
+            valueFrom:
+              secretKeyRef:
+                name: {{ $user | replace "_" "-" }}.{{ include "cray-service.fullname" $root }}-postgres.credentials
+                key: username
+          - name: POSTGRES_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: {{ $user | replace "_" "-" }}.{{ include "cray-service.fullname" $root }}-postgres.credentials
+                key: password
+          - name: POSTGRES_HOST
+            value: "{{ include "cray-service.fullname" $root }}-postgres"
+          - name: POSTGRES_PORT
+            value: "5432"
+          - name: POSTGRES_DB
+            value: "{{ $database }}"
+          resources:
+            requests:
+              cpu: 100m
+              memory: "10Mi"
+            limits:
+              cpu: 500m
+              memory: "100Mi"
+        {{- end }}
+{{- end }}

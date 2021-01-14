@@ -1,0 +1,21 @@
+---
+suite: deployment test for pod annotations
+templates:
+  - deployment.yaml
+tests:
+  - it: should render pod annotations correctly
+    set:
+      podAnnotations:
+        one: 1
+        two: 2
+    asserts:
+      - template: deployment.yaml
+        documentIndex: 0
+        equal:
+          path: spec.template.metadata.annotations.one
+          value: 1
+      - template: deployment.yaml
+        documentIndex: 0
+        equal:
+          path: spec.template.metadata.annotations.two
+          value: 2

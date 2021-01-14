@@ -1,0 +1,53 @@
+{{- if .Values.ingress.enabled -}}
+{{- $fullName := include "cray-service.fullname" . -}}
+{{- $shortName := $fullName | replace "cray-" "" }}
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: "{{ $fullName }}"
+  labels:
+    app.kubernetes.io/name: {{ include "cray-service.name" . }}
+    {{- include "cray-service.common-labels" . | nindent 4 }}
+    {{- with .Values.labels -}}
+    {{- toYaml . | nindent 4 }}
+    {{- end -}}
+    {{- with .Values.ingress.labels -}}
+    {{- toYaml . | nindent 4 }}
+    {{- end -}}
+  {{- with .Values.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  hosts:
+    - "*"
+  gateways:
+    - {{ .Values.ingress.gateway }}
+  http:
+    - match:
+        - uri:
+            {{- if .Values.ingress.prefix }}
+            prefix: "{{ .Values.ingress.prefix }}"
+            {{- else if .Values.ingress.regex }}
+            regex: "{{ .Values.ingress.regex }}"
+            {{- else if .Values.ingress.ui }}
+            prefix: "/{{ $shortName }}"
+            {{- else }}
+            prefix: "/apis/{{ $shortName }}"
+            {{- end }}
+      rewrite:
+        {{- if .Values.ingress.uri }}
+        uri: "{{ .Values.ingress.uri }}"
+        {{- else if .Values.ingress.ui }}
+        uri: "/"
+        {{- else }}
+        uri: "/api"
+        {{- end }}
+      route:
+      {{- range .Values.service.ports }}
+        - destination:
+            host: "{{ $fullName }}"
+            port:
+              number: {{ .port }}
+      {{- end }}
+{{- end }}

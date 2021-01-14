@@ -1,0 +1,44 @@
+{{- if .Values.trsWorker.enabled -}}
+apiVersion: trs.hms.cray.com/v1alpha1
+kind: TRSWorker
+metadata:
+  name: "{{ include "cray-service.fullname" . }}"
+spec:
+  worker_type: {{ .Values.trsWorker.workerType }}
+  worker_version: {{ .Values.trsWorker.workerVersion }}
+
+---
+# The deployment using this TRSWorker really needs to wait for the topics to actually have been created before
+# starting up. This is because in case the Kafka server is configured to allow topics to be created as they are used
+# this would cause a conflict in the operator which would be bad.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: "{{ include "cray-service.fullname" . }}-wait-for-kafka-topics-{{ .Release.Revision }}"
+  labels:
+    app.kubernetes.io/name: {{ include "cray-service.fullname" . }}-wait-for-kafka-topics
+spec:
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/inject: "false"
+    spec:
+      restartPolicy: Never
+      # This service account is created in the TRS operator deployment.
+      serviceAccountName: "kafka-topics-watcher"
+      containers:
+        - name: "wait-for-kafka-topics"
+          image: "{{ include "cray-service.image-prefix" .Values }}loftsman/docker-kubectl"
+          command:
+            - /bin/sh
+            - -c
+            - while [ "`kubectl -n services get kafkatopics.kafka.strimzi.io trs-{{ include "cray-service.fullname" . }}-{{ .Values.trsWorker.workerType }}-{{ .Values.trsWorker.workerVersion }}-rcv -o jsonpath='{.status.conditions[0].type}'`" != "Ready" ]; do
+              echo "Waiting for trs-{{ include "cray-service.fullname" . }}-{{ .Values.trsWorker.workerType }}-{{ .Values.trsWorker.workerVersion }}-rcv to be Ready";
+              sleep 3;
+              done;
+              while [ "`kubectl -n services get kafkatopics.kafka.strimzi.io trs-{{ include "cray-service.fullname" . }}-{{ .Values.trsWorker.workerType }}-{{ .Values.trsWorker.workerVersion }}-send -o jsonpath='{.status.conditions[0].type}'`" != "Ready" ]; do
+              echo "Waiting for trs-{{ include "cray-service.fullname" . }}-{{ .Values.trsWorker.workerType }}-{{ .Values.trsWorker.workerVersion }}-send to be Ready";
+              sleep 3;
+              done;
+              echo "Kafka topics reported ready.";
+{{- end }}

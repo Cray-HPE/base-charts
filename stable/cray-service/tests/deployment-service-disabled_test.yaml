@@ -1,0 +1,12 @@
+---
+suite: deployment service disabled
+templates:
+  - service.yaml
+tests:
+  - it: should not render a service
+    set:
+      service.enabled: false
+    asserts:
+      - template: service.yaml
+        hasDocuments:
+          count: 0

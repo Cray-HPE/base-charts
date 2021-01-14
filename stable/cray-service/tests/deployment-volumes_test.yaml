@@ -1,0 +1,21 @@
+---
+suite: deployment test for volumes list
+templates:
+  - deployment.yaml
+tests:
+  - it: volumes objects should translate to a list in the deployment spec
+    set:
+      volumes:
+        one:
+          name: one
+        two:
+          name: two
+    asserts:
+      - template: deployment.yaml
+        equal:
+          path: spec.template.spec.volumes[0].name
+          value: one
+      - template: deployment.yaml
+        equal:
+          path: spec.template.spec.volumes[1].name
+          value: two

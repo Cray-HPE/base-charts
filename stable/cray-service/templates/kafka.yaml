@@ -1,0 +1,75 @@
+{{- if .Values.kafkaCluster.enabled -}}
+apiVersion: kafka.strimzi.io/v1alpha1
+kind: Kafka
+metadata:
+  name: "{{ include "cray-service.fullname" . }}"
+  labels:
+    app.kubernetes.io/name: {{ include "cray-service.fullname" . }}-postgres
+    {{- include "cray-service.common-labels" . | nindent 4 }}
+    {{- with .Values.kafkaCluster.labels -}}
+    {{ toYaml . | nindent 4 -}}
+    {{- end }}
+spec:
+  kafka:
+    {{- with .Values.kafkaCluster.clusterSettings }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+    template:
+      pod:
+        metadata:
+          annotations:
+            sidecar.istio.io/inject: "false"
+        securityContext:
+          runAsUser: 10001
+          fsGroup: 10001
+
+  zookeeper:
+    {{- with .Values.kafkaCluster.zookeeperSettings }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+    template:
+      pod:
+        metadata:
+          annotations:
+            sidecar.istio.io/inject: "false"
+        securityContext:
+          runAsUser: 10001
+          fsGroup: 10001
+
+  entityOperator:
+    topicOperator: {}
+    userOperator: {}
+    template:
+      pod:
+        metadata:
+          annotations:
+            sidecar.istio.io/inject: "false"
+        securityContext:
+          runAsUser: 10001
+          fsGroup: 10001
+---
+apiVersion: "networking.istio.io/v1alpha3"
+kind: "DestinationRule"
+metadata:
+  name: "{{ include "cray-service.fullname" . }}-kafka-bootstrap-rule"
+  labels:
+    app.kubernetes.io/name: {{ include "cray-service.fullname" . }}-kafka-bootstrap
+spec:
+  host: "{{ include "cray-service.fullname" . }}-kafka-bootstrap"
+  trafficPolicy:
+    tls:
+      mode: DISABLE
+---
+apiVersion: "networking.istio.io/v1alpha3"
+kind: "DestinationRule"
+metadata:
+  name: "{{ include "cray-service.fullname" . }}-kafka-brokers-rule"
+  namespace: services
+  labels:
+    app.kubernetes.io/name: "{{ include "cray-service.fullname" . }}-kafka-bootstrap"
+spec:
+  host: "{{ include "cray-service.fullname" . }}-kafka-brokers"
+  trafficPolicy:
+    tls:
+      mode: DISABLE
+{{ end }}

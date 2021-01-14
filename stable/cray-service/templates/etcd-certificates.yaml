@@ -1,0 +1,82 @@
+{{- if .Values.etcdCluster.tls.enabled -}}
+---
+apiVersion: cert-manager.io/v1alpha2
+kind: Certificate
+metadata:
+  name: "{{ include "cray-service.fullname" . }}-etcd-server-tls"
+spec:
+  secretName: "{{ include "cray-service.fullname" . }}-etcd-server-tls"
+  duration: 720h
+  renewBefore: 24h
+  organization:
+    - Cray
+  commonName: "{{ include "cray-service.fullname" . }}-{{ .Release.Namespace }}-server"
+  isCA: false
+  keySize: 2048
+  keyAlgorithm: rsa
+  keyEncoding: pkcs1
+  usages:
+    - signing
+    - key encipherment
+    - server auth
+    - client auth
+  dnsNames:
+    - "*.{{ include "cray-service.fullname" . }}-etcd.{{ .Release.Namespace }}.svc"
+    - "*.{{ include "cray-service.fullname" . }}-etcd.{{ .Release.Namespace }}.svc.cluster.local"
+    - "{{ include "cray-service.fullname" . }}-etcd-client.{{ .Release.Namespace }}.svc"
+    - "{{ include "cray-service.fullname" . }}-etcd-client.{{ .Release.Namespace }}.svc.cluster.local"
+    - "localhost"
+  issuerRef:
+    name: "{{ .Values.etcdCluster.tls.issuer }}"
+    kind: Issuer
+---
+apiVersion: cert-manager.io/v1alpha2
+kind: Certificate
+metadata:
+  name: "{{ include "cray-service.fullname" . }}-etcd-peer-tls"
+spec:
+  secretName: "{{ include "cray-service.fullname" . }}-etcd-peer-tls"
+  duration: 720h
+  renewBefore: 24h
+  organization:
+    - Cray
+  commonName: "{{ include "cray-service.fullname" . }}-{{ .Release.Namespace }}-peer"
+  isCA: false
+  keySize: 2048
+  keyAlgorithm: rsa
+  keyEncoding: pkcs1
+  usages:
+    - signing
+    - key encipherment
+    - server auth
+    - client auth
+  dnsNames:
+    - "*.{{ include "cray-service.fullname" . }}-etcd.{{ .Release.Namespace }}.svc"
+    - "*.{{ include "cray-service.fullname" . }}-etcd.{{ .Release.Namespace }}.svc.cluster.local"
+  issuerRef:
+    name: "{{ .Values.etcdCluster.tls.issuer }}"
+    kind: Issuer
+---
+apiVersion: cert-manager.io/v1alpha2
+kind: Certificate
+metadata:
+  name: "{{ include "cray-service.fullname" . }}-etcd-client-tls"
+spec:
+  secretName: "{{ include "cray-service.fullname" . }}-etcd-client-tls"
+  duration: 720h
+  renewBefore: 24h
+  organization:
+    - Cray
+  commonName: "{{ include "cray-service.fullname" . }}-{{ .Release.Namespace }}-client"
+  isCA: false
+  keySize: 2048
+  keyAlgorithm: rsa
+  keyEncoding: pkcs1
+  usages:
+    - signing
+    - key encipherment
+    - client auth
+  issuerRef:
+    name: "{{ .Values.etcdCluster.tls.issuer }}"
+    kind: Issuer
+{{- end }}

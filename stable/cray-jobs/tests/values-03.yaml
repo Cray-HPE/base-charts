@@ -1,0 +1,18 @@
+jobs:
+  job01:
+    template:
+      spec:
+        ephemeralContainers:
+          ephemeralContainer01:
+            image:
+              repository: job01-ephemeral
+        initContainers:
+          initContainer01:
+            image:
+              repository: job01-init
+        containers:
+          container01:
+            command: ["test-command"]
+            image:
+              repository: job01
+              pullPolicy: Never

@@ -1,0 +1,74 @@
+---
+suite: deployment defaults
+templates:
+  - deployment.yaml
+  - statefulset.yaml
+  - daemonset.yaml
+  - service.yaml
+  - etcd-cluster.yaml
+  - ingress.yaml
+  - pvcs.yaml
+tests:
+  - it: should default to deployment
+    asserts:
+      - template: deployment.yaml
+        isKind:
+          of: Deployment
+  - it: should render the correct resources
+    asserts:
+      - template: deployment.yaml
+        hasDocuments:
+          count: 1
+      - template: service.yaml
+        hasDocuments:
+          count: 1
+      - template: etcd-cluster.yaml
+        hasDocuments:
+          count: 0
+      - template: ingress.yaml
+        hasDocuments:
+          count: 0
+      - template: statefulset.yaml
+        hasDocuments:
+          count: 0
+      - template: daemonset.yaml
+        hasDocuments:
+          count: 0
+      - template: pvcs.yaml
+        hasDocuments:
+          count: 0
+  - it: should not include containers
+    asserts:
+      - template: deployment.yaml
+        isEmpty:
+          path: spec.template.spec.containers
+  - it: should not include any init containers
+    asserts:
+      - template: deployment.yaml
+        isEmpty:
+          path: spec.template.spec.initContainers
+  - it: should not include nodeSelector
+    asserts:
+      - template: deployment.yaml
+        isEmpty:
+          path: spec.template.spec.nodeSelector
+  - it: should not include affinity
+    asserts:
+      - template: deployment.yaml
+        isEmpty:
+          path: spec.template.spec.affinity
+  - it: should not include tolerations
+    asserts:
+      - template: deployment.yaml
+        isEmpty:
+          path: spec.template.spec.tolerations
+  - it: should not include imagePullSecrets
+    asserts:
+      - template: deployment.yaml
+        isEmpty:
+          path: spec.template.spec.imagePullSecrets
+  - it: pod annotations should not be empty
+    asserts:
+      - template: deployment.yaml
+        isNotEmpty:
+          path: spec.template.metadata.annotations

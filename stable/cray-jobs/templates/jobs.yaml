@@ -1,0 +1,42 @@
+{{- $root := . -}}
+{{- range $jobName, $jobSpec := .Values.jobs -}}
+{{- $jobPodTemplateSpec := index $jobSpec "template" "spec" -}}
+{{- include "cray-jobs.render-containers" (dict "Root" $root "Key" "containers" "JobPodTemplateSpec" $jobPodTemplateSpec "Containers" (index $jobPodTemplateSpec "containers")) -}}
+{{- if index $jobPodTemplateSpec "initContainers" -}}
+{{- include "cray-jobs.render-containers" (dict "Root" $root "Key" "initContainers" "JobPodTemplateSpec" $jobPodTemplateSpec "Containers" (index $jobPodTemplateSpec "initContainers")) -}}
+{{- end -}}
+{{- if index $jobPodTemplateSpec "ephemeralContainers" -}}
+{{- include "cray-jobs.render-containers" (dict "Root" $root "Key" "ephemeralContainers" "JobPodTemplateSpec" $jobPodTemplateSpec "Containers" (index $jobPodTemplateSpec "ephemeralContainers")) -}}
+{{- end }}
+{{- $jobMetadataAnnotations := index $jobSpec "annotations" -}}
+{{- $_ := unset $jobSpec "annotations" -}}
+{{- if not (index $jobPodTemplateSpec "restartPolicy") -}}
+{{- $_ := set $jobPodTemplateSpec "restartPolicy" "Never" -}}
+{{- end -}}
+{{/*
+# TODO: couldn't get the below to work in a single block, e.g.
+#       if or (not $jobMetadataAnnotations) (not (index $jobMetadataAnnotations "helm.sh/hook"))
+#       should evaluate the first item in the or list and bail if it doesn't pass, but the second one will get evalulated regardless
+#       resulting in a nil pointer exception in cases where not $jobMetadataAnnotations
+*/}}
+{{- if not $jobMetadataAnnotations -}}
+{{- $jobName = printf "%s-%s" $jobName (include "cray-jobs.release-revision" $root) -}}
+{{- end -}}
+{{- if $jobMetadataAnnotations -}}
+{{- if not (index $jobMetadataAnnotations "helm.sh/hook") -}}
+{{- $jobName = printf "%s-%s" $jobName (include "cray-jobs.release-revision" $root) -}}
+{{- end -}}
+{{- end }}
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "cray-jobs.fullname" $root }}-{{ $jobName }}
+  labels:
+    app.kubernetes.io/name: {{ include "cray-jobs.name" $root }}-{{ $jobName }}
+    {{- include "cray-jobs.common-labels" $root | nindent 4 }}
+  annotations:
+    {{- include "cray-jobs.common-annotations" (dict "Root" $root "JobMetadataAnnotations" $jobMetadataAnnotations) | nindent 4 }}
+spec:
+{{ toYaml $jobSpec | indent 2 }}
+{{- end -}}

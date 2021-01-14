@@ -1,0 +1,13 @@
+---
+suite: deployment ensure custom service account set
+templates:
+  - deployment.yaml
+tests:
+  - it: should include a single container port named http at port 80
+    set:
+      serviceAccountName: "custom-service-account"
+    asserts:
+      - template: deployment.yaml
+        equal:
+          path: spec.template.spec.serviceAccountName
+          value: custom-service-account

@@ -1,0 +1,89 @@
+---
+suite: deployment pvcs test
+templates:
+  - pvcs.yaml
+tests:
+  - it: should render 1 pvc
+    set:
+      persistentVolumeClaims:
+        one:
+          name: one
+    asserts:
+      - template: pvcs.yaml
+        hasDocuments:
+          count: 1
+      - template: pvcs.yaml
+        isNull:
+          path: spec.storageClassName
+  - it: should render the correct default access mode
+    set:
+      persistentVolumeClaims:
+        one:
+          name: one
+    asserts:
+      - template: pvcs.yaml
+        equal:
+          path: spec.accessModes[0]
+          value: ReadWriteOnce
+  - it: should render the correct default storage size
+    set:
+      persistentVolumeClaims:
+        one:
+          name: one
+    asserts:
+      - template: pvcs.yaml
+        equal:
+          path: spec.resources.requests.storage
+          value: 1Gi
+  - it: should render 3 pvcs
+    set:
+      persistentVolumeClaims:
+        one:
+          name: one
+        two:
+          name: two
+        three:
+          name: three
+    asserts:
+      - template: pvcs.yaml
+        hasDocuments:
+          count: 3
+  - it: should render pvcs with explicit storage class
+    set:
+      storageClass: smf
+      persistentVolumeClaims:
+        one:
+          name: one
+        two:
+          name: two
+    asserts:
+      - template: pvcs.yaml
+        hasDocuments:
+          count: 2
+      - template: pvcs.yaml
+        equal:
+          path: spec.storageClassName
+          value: smf
+  - it: should render pvcs with different storage classes
+    set:
+      storageClass: smf
+      persistentVolumeClaims:
+        one:
+          name: one
+        two:
+          storageClass: ceph-cephfs-external
+          name: two
+    asserts:
+      - template: pvcs.yaml
+        hasDocuments:
+          count: 2
+      - template: pvcs.yaml
+        equal:
+          path: spec.storageClassName
+          value: smf
+        documentIndex: 0
+      - template: pvcs.yaml
+        equal:
+          path: spec.storageClassName
+          value: ceph-cephfs-external
+        documentIndex: 1

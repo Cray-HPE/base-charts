@@ -1,0 +1,89 @@
+---
+suite: deployment test customisable update strategy
+templates:
+  - deployment.yaml
+tests:
+  - it: should set update strategy to Recreate
+    set:
+      strategy:
+        type: Recreate
+    asserts:
+      - template: deployment.yaml
+        equal:
+          path: spec.strategy.type
+          value: Recreate
+      - template: deployment.yaml
+        isNull:
+          path: spec.strategy.rollingUpdate
+  - it: should set update strategy to Recreate (user provides null rollingUpdate)
+    set:
+      strategy:
+        type: Recreate
+        rollingUpdate: null
+    asserts:
+      - template: deployment.yaml
+        equal:
+          path: spec.strategy.type
+          value: Recreate
+      - template: deployment.yaml
+        isNull:
+          path: spec.strategy.rollingUpdate
+  - it: should set maxSurge
+    set:
+      strategy:
+        type: RollingUpdate
+        rollingUpdate:
+          maxSurge: 50%
+    asserts:
+      - template: deployment.yaml
+        equal:
+          path: spec.strategy.type
+          value: RollingUpdate
+      - template: deployment.yaml
+        equal:
+          path: spec.strategy.rollingUpdate.maxSurge
+          value: 50%
+      - template: deployment.yaml
+        isNotNull:
+          path: spec.strategy.rollingUpdate
+  - it: should set maxUnavailable
+    set:
+      strategy:
+        type: RollingUpdate
+        rollingUpdate:
+          maxUnavailable: 50%
+    asserts:
+      - template: deployment.yaml
+        equal:
+          path: spec.strategy.type
+          value: RollingUpdate
+      - template: deployment.yaml
+        equal:
+          path: spec.strategy.rollingUpdate.maxUnavailable
+          value: 50%
+      - template: deployment.yaml
+        isNotNull:
+          path: spec.strategy.rollingUpdate
+  - it: should set maxSurge and maxUnavailable
+    set:
+      strategy:
+        type: RollingUpdate
+        rollingUpdate:
+          maxSurge: 30%
+          maxUnavailable: 50%
+    asserts:
+      - template: deployment.yaml
+        equal:
+          path: spec.strategy.type
+          value: RollingUpdate
+      - template: deployment.yaml
+        equal:
+          path: spec.strategy.rollingUpdate.maxSurge
+          value: 30%
+      - template: deployment.yaml
+        equal:
+          path: spec.strategy.rollingUpdate.maxUnavailable
+          value: 50%
+      - template: deployment.yaml
+        isNotNull:
+          path: spec.strategy.rollingUpdate

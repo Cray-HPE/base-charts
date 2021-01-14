@@ -1,0 +1,94 @@
+---
+suite: deployment env test
+templates:
+  - deployment.yaml
+tests:
+  - it: should be able to render custom env values in init containers
+    set:
+      initContainers:
+        test-init-container:
+          name:
+          image:
+            repository: "" # e.g. cray/my-service
+            tag: latest
+            pullPolicy: IfNotPresent
+          env:
+            - name: INIT_ONE
+              value: "init_1"
+            - name: INIT_SECRET_VALUE
+              valueFrom:
+                secretKeyRef:
+                  name: init_example_secret
+                  key: "init_example_secret_key"
+      containers:
+        test-container:
+          name: "" # e.g. my-service
+          image:
+            repository: "" # e.g. cray/my-service
+            tag: latest
+            pullPolicy: IfNotPresent
+          env:
+            - name: ONE
+              value: "1"
+            - name: SECRET_VALUE
+              valueFrom:
+                secretKeyRef:
+                  name: example_secret
+                  key: "example_secret_key"
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 3
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 3
+    asserts:
+      - template: deployment.yaml
+        equal:
+          path: spec.template.spec.containers[0].env[0].name
+          value: ONE
+      - template: deployment.yaml
+        equal:
+          path: spec.template.spec.containers[0].env[0].value
+          value: "1"
+      - template: deployment.yaml
+        equal:
+          path: spec.template.spec.containers[0].env[1].name
+          value: SECRET_VALUE
+      - template: deployment.yaml
+        equal:
+          path: spec.template.spec.containers[0].env[1].valueFrom.secretKeyRef.name
+          value: example_secret
+      - template: deployment.yaml
+        equal:
+          path: spec.template.spec.containers[0].env[1].valueFrom.secretKeyRef.key
+          value: example_secret_key
+      - template: deployment.yaml
+        equal:
+          path: spec.template.spec.initContainers[0].env[0].name
+          value: INIT_ONE
+      - template: deployment.yaml
+        equal:
+          path: spec.template.spec.initContainers[0].env[0].value
+          value: "init_1"
+      - template: deployment.yaml
+        equal:
+          path: spec.template.spec.initContainers[0].env[1].name
+          value: INIT_SECRET_VALUE
+      - template: deployment.yaml
+        equal:
+          path: spec.template.spec.initContainers[0].env[1].valueFrom.secretKeyRef.name
+          value: init_example_secret
+      - template: deployment.yaml
+        equal:
+          path: spec.template.spec.initContainers[0].env[1].valueFrom.secretKeyRef.key
+          value: init_example_secret_key

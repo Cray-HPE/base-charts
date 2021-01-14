@@ -1,0 +1,64 @@
+suite: deployment test for volumes list
+templates:
+  - statefulset.yaml
+  - deployment.yaml
+tests:
+  - it: volumeClaimTemplate with default values
+    set:
+      type: StatefulSet
+    asserts:
+      - template: statefulset.yaml
+        hasDocuments:
+          count: 1
+      - template: statefulset.yaml
+        isKind:
+          of: StatefulSet
+      - template: statefulset.yaml
+        equal:
+          path: spec.replicas
+          value: 1
+      - template: statefulset.yaml
+        equal:
+          path: spec.volumeClaimTemplates.spec.resources.requests.storage
+          value: 1Gi
+      - template: statefulset.yaml
+        equal:
+          path: spec.volumeClaimTemplates.spec.storageClassName
+          value: ""
+      - template: statefulset.yaml
+        equal:
+          path: spec.volumeClaimTemplates.metadata.name
+          value: "cray-service"
+  - it: volumeClaimTemplate filled correctly
+    set:
+      type: StatefulSet
+      replicaCount: 3
+      volumeClaimTemplate.name: "BigStorage"
+      volumeClaimTemplate.resources.requests.storage: "2Gi"
+      volumeClaimTemplate.storageClassName: "BigStorageClass"
+    asserts:
+      - template: statefulset.yaml
+        hasDocuments:
+          count: 1
+      - template: statefulset.yaml
+        isKind:
+          of: StatefulSet
+      - template: statefulset.yaml
+        equal:
+          path: spec.replicas
+          value: 3
+      - template: statefulset.yaml
+        equal:
+          path: spec.volumeClaimTemplates.spec.resources.requests.storage
+          value: 2Gi
+      - template: statefulset.yaml
+        equal:
+          path: spec.volumeClaimTemplates.spec.storageClassName
+          value: "BigStorageClass"
+      - template: statefulset.yaml
+        equal:
+          path: spec.volumeClaimTemplates.metadata.name
+          value: "BigStorage"
+
+
+

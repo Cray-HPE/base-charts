@@ -1,0 +1,90 @@
+---
+suite: deployment test for sql enabled
+templates:
+  - kafka.yaml
+  - deployment.yaml
+tests:
+  - it: should render 1 kafka cluster w/ 2 destination rules
+    set:
+      kafkaCluster.enabled: true
+    asserts:
+      - template: kafka.yaml
+        hasDocuments:
+          count: 3
+  - it: should render destination rules with the appropriate values
+    set:
+      kafkaCluster.enabled: true
+      chart.name: "test-chart"
+    asserts:
+      - template: kafka.yaml
+        documentIndex: 1
+        equal:
+          path: spec.host
+          value: RELEASE-NAME-cray-service-kafka-bootstrap
+      - template: kafka.yaml
+        documentIndex: 2
+        equal:
+          path: spec.host
+          value: RELEASE-NAME-cray-service-kafka-brokers
+  - it: should render kafka cluster with the appropriate default values
+    set:
+      kafkaCluster.enabled: true
+    asserts:
+      - template: kafka.yaml
+        documentIndex: 0
+        equal:
+          path: spec.kafka.config
+          value:
+            offsets.topic.replication.factor: 3
+            transaction.state.log.min.isr: 2
+            transaction.state.log.replication.factor: 3
+      - template: kafka.yaml
+        documentIndex: 0
+        equal:
+          path: spec.kafka.replicas
+          value: 3
+
+  - it: should include secrets mount for Kafka cluster CA certificate
+    set:
+      kafkaCluster:
+        enabled: true
+      containers:
+        test-container:
+          name: test-service
+          image:
+            repository: test-service
+          volumeMounts:
+            - name: test-mount
+              mountPath: /my-path
+    asserts:
+      - template: deployment.yaml
+        equal:
+          path: spec.template.spec.containers[0].volumeMounts[0].name
+          value: cray-service-cluster-ca-cert
+      - template: deployment.yaml
+        equal:
+          path: spec.template.spec.containers[0].volumeMounts[0].mountPath
+          value: /secrets/kafka/cluster
+      - template: deployment.yaml
+        equal:
+          path: spec.template.spec.containers[0].volumeMounts[1].name
+          value: test-mount
+      - template: deployment.yaml
+        equal:
+          path: spec.template.spec.containers[0].volumeMounts[1].mountPath
+          value: /my-path
+
+  - it: should include an init container that waits for the readiness watcher job
+    set:
+      kafkaCluster.enabled: true
+      chart.name: "test-chart"
+      imagesHost: "my-repo"
+    asserts:
+      - template: deployment.yaml
+        equal:
+          path: spec.template.spec.initContainers[0].name
+          value: wait-for-kafka
+      - template: deployment.yaml
+        equal:
+          path: spec.template.spec.initContainers[0].image
+          value: "my-repo/library/busybox:1.28.0-glibc"

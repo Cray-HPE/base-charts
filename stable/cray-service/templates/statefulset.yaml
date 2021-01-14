@@ -1,0 +1,53 @@
+{{- if eq (.Values.type | lower) "statefulset" -}}
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "cray-service.fullname" . }}
+  labels:
+    app.kubernetes.io/name: {{ include "cray-service.name" . }}
+    {{- include "cray-service.common-labels" . | nindent 4 }}
+  annotations:
+    {{- include "cray-service.common-annotations" . | nindent 4 }}
+spec:
+  serviceName: {{ include "cray-service.fullname" . }}
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "cray-service.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "cray-service.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+      annotations:
+        {{- include "cray-service.pod-annotations" . | nindent 8 }}
+    spec:
+      {{- include "cray-service.common-spec" . | nindent 6 }}
+  volumeClaimTemplates:
+    metadata:
+      {{- if .Values.volumeClaimTemplate.name }}
+      name: {{ .Values.volumeClaimTemplate.name }}
+      {{- else }}
+      name: {{ include "cray-service.name" . }}
+      {{- end }}
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: {{ .Values.volumeClaimTemplate.resources.requests.storage }}
+      {{- if .Values.volumeClaimTemplate.storageClassName }}
+      {{- if (eq "-" .Values.volumeClaimTemplate.storageClassName) }}
+      storageClassName: ""
+      {{- else }}
+      storageClassName: "{{ .Values.volumeClaimTemplate.storageClassName }}"
+      {{- end }}
+      {{- else }}
+      {{- if .Values.storageClass }}
+      storageClassName: "{{ .Values.storageClass }}"
+      {{- else }}
+      storageClassName: ""
+      {{- end }}
+      {{- end }}
+
+{{- end }}

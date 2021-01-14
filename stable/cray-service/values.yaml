@@ -1,0 +1,269 @@
+---
+# Default values for cray-service.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+imagesHost: "dtr.dev.cray.com" # this value will always be set on helm install based on install context, this is a reasonable default
+imagePullSecrets: []
+storageClass: "" # intended to be set/overriden at install time, or not set at all to use the default
+
+# TODO: finish full support for StatefulSet and DaemonSet
+type: Deployment # Deployment|StatefulSet|DaemonSet
+nameOverride: "" # the name of your service
+fullnameOverride: "" # use this if you want to provide a more-complete name for certain labels/naming (very optional)
+replicaCount: 1
+partitionId: ""
+# custom pod hostname
+hostname: ""
+# the below are labels/annotations to generically apply to metadata on resources.
+# There are also others available in individual resources below for applying
+# uniquely there
+#
+# Note that this base chart already applies standard labels and annotations by
+# default, you only need to worry about adding your own if you have specific
+# needs for labeling or annotating
+labels: {}
+annotations: {}
+# pod annotations only apply to spec.template.metadata.annotations within a deployment, statefulset, daemonset, etc.
+podAnnotations: {}
+# standard Kubernetes nodeSelector, tolerations, and affinity objects for spec
+nodeSelector: {}
+tolerations: []
+affinity: {}
+serviceAccountName: "" # if set, not empty, will set the service account to use for the deployment/statefulset, daemonset, etc.
+
+# Deployment Upgrade Strategy
+# Only relevant if type: Deployment is set
+# This is the standard K8S DeploymentStrategy object
+# https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.18/#deploymentstrategy-v1-apps
+strategy: {}
+
+# standard k8s initContainers
+# standard k8s container properties supported: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.10/#container-v1-core
+initContainers: {}
+# my-service-init-container: # arbitrary key name
+#   name: ""
+#   image:
+#     repository: "" # e.g. cray/my-service
+#     tag: latest
+#     pullPolicy: IfNotPresent
+#   ...
+#   other standard k8s container/init container properties supported: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.17/#container-v1-core
+
+containers: {}
+# your-container-name: # arbitrary key name
+#   name: "" # e.g. my-service
+#   image:
+#     repository: "" # e.g. cray/my-service
+#     tag: latest
+#     pullPolicy: IfNotPresent
+#   env: []
+#   ports:
+#     - name: http
+#       containerPort: 80
+#       protocol: TCP
+#   livenessProbe:
+#     httpGet:
+#       path: /
+#       port: 80
+#     initialDelaySeconds: 5
+#     periodSeconds: 3
+#   readinessProbe:
+#     httpGet:
+#       path: /
+#       port: 80
+#     initialDelaySeconds: 5
+#     periodSeconds: 3
+#   ... other standard k8s container properties supported: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.17/#container-v1-core
+
+# standard Kubernetes volumes definitions per object
+volumes: {}
+# volume: # arbitrary key name
+#   name: my-dir
+#   emptyDir: {}
+
+# standard Kubernetes securityContext
+# This can be useful if you want to control the UID/GID under which your container runs
+# or manage permissions for mounted volumes
+# See https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.10/#podsecuritycontext-v1-core
+# securityContext:
+#   runAsUser: 1000
+#   runAsGroup: 2000
+#   fsGroup: 2000
+
+service:
+  enabled: true
+  type: ClusterIP
+  network: node-management # node-management|hardware-management|high-speed|customer-access
+  sharedIp: false
+  # Uncomment if using LoadBalancer type and need to specify it's IP
+  #loadBalancerIP: ""
+  # standard Kubernetes service port defintions
+  ports:
+    - port: 80
+      name: http
+      protocol: TCP
+      targetPort: http
+  labels: {}
+  annotations: {}
+
+etcdCluster:
+  enabled: false
+  # compactionMode options: ‘periodic’, ‘revision’.
+  compactionMode: periodic
+  # ‘periodic’ for duration based retention, defaulting to hours if no time unit is provided (e.g. ‘5m’).
+  # ‘revision’ for revision number based retention.
+  compactionRetention: 1 # Auto compaction retention. 0 means disable auto compaction.
+  # if compactionMode == periodic, then compactionRetention is the time on which compaction should trigger. default (1 hour)
+  # if compactionMode == revision, then compactionRetention is the number of revisions at when compaction will get trigger.
+
+  snapshotMax: 5 # Maximum number of snapshot files to retain (0 is unlimited)
+  snapshotCount: 10000 # Down from default of 100000 -- easier on memory
+  heartbeatInterval: 4200 # Time (in milliseconds) of a heartbeat interval.
+  electionTimeout: 21000 # Time (in milliseconds) for an election to timeout
+  enforceAntiAffinity: true # NOTE: If affinity is specified, this is ignored (to support backward compatibility)
+  maxQuota: false # Default quota is 2GB -- setting to true sets quota to max (10GB)
+  size: 3
+  version: "3.3.22"  #  NOTE: If you change this, ensure the version you are changing to is in the blob
+  labels: {}
+  annotations: {}
+  nodeSelector: {}
+  affinity: {}
+  #
+  # Consumers of this chart can override etcd cluster pod resource limits as follows:
+  #
+  # resources:
+  #   limits:
+  #     cpu: "2"
+  #     memory: 2Gi
+  #   requests:
+  #     cpu: 10m
+  #     memory: 64Mi
+  resources: {}
+  pvc:
+    enabled: true
+    accessMode: "ReadWriteOnce"
+    storage: 3Gi # A bit of headroom above 2GB quota default
+  tls:
+    enabled: false
+    issuer: cert-manager-issuer-common
+
+# A list of sealedSecrets passed in to be deployed.
+sealedSecrets: []
+# Whether or not to mount secrets as volumeMounts to containers
+mountSealedSecrets: true
+
+# TODO, further work on official ingress via istio and otherwise for different scenarios
+ingress:
+  enabled: false
+  ui: false # TODO: we're not actually doing anything with this yet, but should be applicable for istio auth decisions
+  # ingress.gateway
+  # This should never really be changed unless you know what you're doing.
+  gateway: "services-gateway"
+  # ingress.prefix
+  # This is the route to your service through the gateway from the outside. It defaults to /apis/{service name minus any `cray-`}
+  # Example: `cray-ims` would default to `/apis/ims` if prefix == ""
+  prefix: ""
+  # ingress.regex
+  # If set, AND the prefix value isn't set, then will use a regex to match incoming traffic to the gateway to this
+  # route. Allows for the possibility of capturing more than the prefix value does for routing to your underlying
+  # service
+  regex: ""
+  # ingress.uri
+  # This is the route your container is expecting as a base path (where kong routes to). It defaults to /api
+  # A call from the ingress to {ingress.prefix}/foo/bar would route to your container as {ingress.uri}/foo/bar
+  # Example: Assume ingress.prefix == /apis/ims, ingress.uri == /api, GET kong:30443/apis/ims/v1/foo -> ims_container/api/v1/foo
+  uri: ""
+  labels: {}
+  annotations: {}
+
+sqlCluster:
+  enabled: false
+  instanceCount: 3
+  postgresVersion: "11"
+  volumeSize: 1Gi
+  users:
+    service_account: []
+  databases:
+    service_db: service_account
+  tls:
+    enabled: true
+    issuer: cert-manager-issuer-common
+  #
+  # Consumers of this chart can override postgres cluster pod resource limits as follows:
+  #
+  # resources:
+  #   limits:
+  #     cpu: "1"
+  #     memory: 500Mi
+  #   requests:
+  #     cpu: 100m
+  #     memory: 100Mi
+  resources: {}
+  #
+  # Consumers of this chart can override postgres parameters as follows:
+  #
+  # parameters:
+  #   shared_buffers: "32MB"
+  #   max_connections: "10"
+  #   log_statement: "all"
+  parameters: {}
+
+
+trsWorker:
+  enabled: false
+  workerType: "http"
+  workerVersion: "v1"
+
+kafkaCluster:
+  enabled: false
+  ### For examples of what can go in the following sections
+  # please see examples in: https://github.com/strimzi/strimzi-kafka-operator/tree/master/examples/kafka
+  clusterSettings:
+    version: 2.2.1
+    replicas: 3
+    listeners:
+      plain: {}
+      tls: {}
+    config:
+      offsets.topic.replication.factor: 3
+      transaction.state.log.replication.factor: 3
+      transaction.state.log.min.isr: 2
+    storage:
+      type: jbod
+      volumes:
+      - id: 0
+        type: persistent-claim
+        size: 1Gi
+        deleteClaim: false
+  zookeeperSettings:
+    replicas: 3
+    storage:
+      type: persistent-claim
+      size: 1Gi
+      deleteClaim: false
+
+persistentVolumeClaims: {}
+# persistent-volume: # arbitrary key name
+#   name: persistent-volume
+#   accessModes:
+#     - ReadWriteOnce
+#   storageClass: smf # Optional per-volume storage class, used in preference to global storageClass if both are present
+#   resources: {}
+
+volumeClaimTemplate:
+  name: ""
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName:
+
+
+global:
+  appVersion: "" # This is set at build time.
+  # these are values to address shortcomings of helm in referencing .Chart.* values in sub-charts/parent charts:
+  # https://github.com/helm/helm/issues/4314
+  # https://github.com/helm/helm/issues/3920
+  chart:
+    name: "" # set at deploy time automatically, no need to ever set explicitly
+    version: "" # set at deploy time automatically, no need to ever set explicitly

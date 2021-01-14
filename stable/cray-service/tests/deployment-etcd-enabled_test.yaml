@@ -1,0 +1,381 @@
+---
+suite: deployment test for etcd enabled
+templates:
+  - etcd-cluster.yaml
+  - etcd-certificates.yaml
+  - deployment.yaml
+tests:
+  - it: should render 1 etcd cluster w/ 3 documents
+    set:
+      etcdCluster.enabled: true
+    asserts:
+      - template: etcd-cluster.yaml
+        hasDocuments:
+          count: 4
+  - it: should render the correct destination rule
+    set:
+      etcdCluster.enabled: true
+      chart.name: "test-chart"
+    asserts:
+      - template: etcd-cluster.yaml
+        documentIndex: 1
+        equal:
+          path: spec.host
+          value: cray-service-etcd-client
+  - it: should include ETCD_* values in the container
+    set:
+      etcdCluster.enabled: true
+      chart.name: "test-chart"
+      containers:
+        test-service:
+          name: test-service
+          image:
+            repository: test-service
+    asserts:
+      - template: deployment.yaml
+        equal:
+          path: spec.template.spec.containers[0].env[0].value
+          value: cray-service-etcd-client
+      - template: deployment.yaml
+        equal:
+          path: spec.template.spec.containers[0].env[1].value
+          value: "2379"
+  - it: should include an init container that waits for the readiness watcher job
+    set:
+      etcdCluster.enabled: true
+      chart.name: "test-chart"
+      imagesHost: "my-repo"
+    asserts:
+      - template: deployment.yaml
+        equal:
+          path: spec.template.spec.initContainers[0].name
+          value: RELEASE-NAME-cray-service-wait-for-etcd
+      - template: deployment.yaml
+        equal:
+          path: spec.template.spec.initContainers[0].image
+          value: "my-repo/loftsman/docker-kubectl:latest"
+      - template: deployment.yaml
+        equal:
+          path: spec.template.spec.serviceAccountName
+          value: jobs-watcher
+  - it: should include nodeSelector when specified
+    set:
+      etcdCluster.enabled: true
+      etcdCluster.nodeSelector:
+        foo: bar
+    asserts:
+      - template: etcd-cluster.yaml
+        documentIndex: 0
+        equal:
+          path: spec.pod.nodeSelector.foo
+          value: bar
+  - it: should include affinity when specified
+    set:
+      etcdCluster.enabled: true
+      etcdCluster.affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: kubernetes.io/e2e-az-name
+                operator: In
+                values:
+                - e2e-az1
+                - e2e-az2
+    asserts:
+      - template: etcd-cluster.yaml
+        documentIndex: 0
+        equal:
+          path: spec.pod.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].key
+          value: kubernetes.io/e2e-az-name
+  - it: should not include node selector or affinity when not set
+    set:
+      etcdCluster.enabled: true
+      etcdCluster.enforceAntiAffinity: false
+    asserts:
+      - template: etcd-cluster.yaml
+        documentIndex: 0
+        isNull:
+          path: spec.pod.nodeSelector
+      - template: etcd-cluster.yaml
+        documentIndex: 0
+        isNull:
+          path: spec.pod.affinity
+  - it: should enable auto compaction retention
+    set:
+      etcdCluster.enabled: true
+    asserts:
+      - template: etcd-cluster.yaml
+        documentIndex: 0
+        equal:
+          path: spec.pod.etcdEnv[0].name
+          value: ETCD_AUTO_COMPACTION_RETENTION
+        equal:
+          path: spec.pod.etcdEnv[0].value
+          value: "1"
+  - it: should enable auto compaction mode
+    set:
+      etcdCluster.enabled: true
+    asserts:
+      - template: etcd-cluster.yaml
+        documentIndex: 0
+        equal:
+          path: spec.pod.etcdEnv[1].name
+          value: ETCD_AUTO_COMPACTION_MODE
+        equal:
+          path: spec.pod.etcdEnv[1].value
+          value: "periodic"
+  - it: should enable heartbeat interval
+    set:
+      etcdCluster.enabled: true
+    asserts:
+      - template: etcd-cluster.yaml
+        documentIndex: 0
+        equal:
+          path: spec.pod.etcdEnv[2].name
+          value: ETCD_HEARTBEAT_INTERVAL
+        equal:
+          path: spec.pod.etcdEnv[2].value
+          value: "4200"
+  - it: should enable leader election timeout
+    set:
+      etcdCluster.enabled: true
+    asserts:
+      - template: etcd-cluster.yaml
+        documentIndex: 0
+        equal:
+          path: spec.pod.etcdEnv[3].name
+          value: ETCD_ELECTION_TIMEOUT
+        equal:
+          path: spec.pod.etcdEnv[3].value
+          value: "21000"
+  - it: should enable maximum snapshots
+    set:
+      etcdCluster.enabled: true
+    asserts:
+      - template: etcd-cluster.yaml
+        documentIndex: 0
+        equal:
+          path: spec.pod.etcdEnv[4].name
+          value: ETCD_MAX_SNAPSHOTS
+        equal:
+          path: spec.pod.etcdEnv[4].value
+          value: "5"
+  - it: should include 10GB max if maxQuota is set
+    set:
+      etcdCluster.enabled: true
+      etcdCluster.maxQuota: true
+    asserts:
+      - template: etcd-cluster.yaml
+        documentIndex: 0
+        equal:
+          path: spec.pod.etcdEnv[6].name
+          value: ETCD_QUOTA_BACKEND_BYTES
+        equal:
+          path: spec.pod.etcdEnv[6].value
+          value: "10737418240"
+  - it: should not include 10GB max if maxQuota is not set
+    set:
+      etcdCluster.enabled: true
+      etcdCluster.maxQuota: false
+    asserts:
+      - template: etcd-cluster.yaml
+        documentIndex: 0
+        notContains:
+          path: spec.pod.etcdEnv
+          content:
+            name: ETCD_QUOTA_BACKEND_BYTES
+            value: "10737418240"
+  - it: should set ETCD_SNAPSHOT_COUNT to 10000 by default
+    set:
+      etcdCluster.enabled: true
+    asserts:
+      - template: etcd-cluster.yaml
+        documentIndex: 0
+        equal:
+          path: spec.pod.etcdEnv[5].name
+          value: ETCD_SNAPSHOT_COUNT
+        equal:
+          path: spec.pod.etcdEnv[5].value
+          value: "10000"
+  - it: should support overriding ETCD_SNAPSHOT_COUNT
+    set:
+      etcdCluster.enabled: true
+      etcdCluster.snapshotCount: 5
+    asserts:
+      - template: etcd-cluster.yaml
+        documentIndex: 0
+        equal:
+          path: spec.pod.etcdEnv[5].name
+          value: ETCD_SNAPSHOT_COUNT
+        equal:
+          path: spec.pod.etcdEnv[5].value
+          value: "5"
+  - it: should include podAntiAffinity when specified (default)
+    set:
+      etcdCluster.enabled: true
+    asserts:
+      - template: etcd-cluster.yaml
+        documentIndex: 0
+        isNotNull:
+          path: spec.pod.affinity.podAntiAffinity
+  - it: should not include podAntiAffinity when not specified
+    set:
+      etcdCluster.enabled: true
+      etcdCluster.enforceAntiAffinity: false
+    asserts:
+      - template: etcd-cluster.yaml
+        documentIndex: 0
+        isNull:
+          path: spec.pod.affinity
+  - it: should not include pod compute resources when not specified (default)
+    set:
+      etcdCluster.enabled: true
+    asserts:
+      - template: etcd-cluster.yaml
+        documentIndex: 0
+        isNull:
+          path: spec.pod.resources
+  - it: should include etcd compute resources when specified
+    set:
+      etcdCluster.enabled: true
+      etcdCluster.resources:
+        limits:
+          cpu: 1
+          memory: 1Gi
+        requests:
+          cpu: 11m
+          memory: 44Mi
+    asserts:
+      - template: etcd-cluster.yaml
+        documentIndex: 0
+        equal:
+          path: spec.pod.resources.limits.cpu
+          value: 1
+        equal:
+          path: spec.pod.resources.limits.memory
+          value: 1Gi
+        equal:
+          path: spec.pod.resources.requests.cpu
+          value: 11m
+        equal:
+          path: spec.pod.resources.requests.memory
+          value: 44Mi
+  - it: should enable TLS when set
+    set:
+      etcdCluster.enabled: true
+      etcdCluster.tls.enabled: true
+    asserts:
+      - template: etcd-cluster.yaml
+        documentIndex: 0
+        equal:
+          path: spec.TLS.static.member.peerSecret
+          value: RELEASE-NAME-cray-service-etcd-peer-tls
+        equal:
+          path: spec.TLS.static.member.serverSecret
+          value: RELEASE-NAME-cray-service-etcd-server-tls
+        equal:
+          path: spec.TLS.static.operatorSecret
+          value: RELEASE-NAME-cray-service-etcd-client-tls
+  - it: should use TLS client secret with wait-for etcd container when TLS is enabled
+    set:
+      etcdCluster.enabled: true
+      etcdCluster.tls.enabled: true
+    asserts:
+      - template: etcd-cluster.yaml
+        documentIndex: 3
+        equal:
+          path: spec.template.spec.containers[0].command[2]
+          value: until etcdctl --ca-file /tls/ca.crt --cert-file /tls/tls.crt --key-file /tls/tls.key --endpoints https://$ETCD_HOST:$ETCD_PORT cluster-health; do echo "Waiting for etcd cluster"; sleep 2; done; echo 'ETCD READY';
+      - template: etcd-cluster.yaml
+        documentIndex: 3
+        equal:
+          path: spec.template.spec.containers[0].volumeMounts[0].name
+          value: tls
+      - template: etcd-cluster.yaml
+        documentIndex: 3
+        equal:
+          path: spec.template.spec.volumes[0].name
+          value: tls
+      - template: etcd-cluster.yaml
+        documentIndex: 3
+        equal:
+          path: spec.template.spec.volumes[0].secret.secretName
+          value: RELEASE-NAME-cray-service-etcd-client-tls
+  - it: should not use TLS client secret with wait-for etcd container when TLS is disabled
+    set:
+      etcdCluster.enabled: true
+      etcdCluster.tls.enabled: false
+    asserts:
+      - template: etcd-cluster.yaml
+        documentIndex: 3
+        equal:
+          path: spec.template.spec.containers[0].command[2]
+          value: until etcdctl --endpoints http://$ETCD_HOST:$ETCD_PORT cluster-health; do echo "Waiting for etcd cluster"; sleep 2; done; echo 'ETCD READY';
+      - template: etcd-cluster.yaml
+        documentIndex: 3
+        equal:
+          path: spec.template.spec.containers[0].volumeMounts
+          value: NULL
+      - template: etcd-cluster.yaml
+        documentIndex: 3
+        equal:
+          path: spec.template.spec.volumes
+          value: NULL
+  - it: should create TLS certificate requests for server cert when TLS is enabled
+    set:
+      etcdCluster.enabled: true
+      etcdCluster.tls.enabled: true
+    asserts:
+      - template: etcd-certificates.yaml
+        documentIndex: 0
+        equal:
+          path: spec.commonName
+          value: RELEASE-NAME-cray-service-NAMESPACE-server
+      - template: etcd-certificates.yaml
+        documentIndex: 0
+        equal:
+          path: spec.dnsNames
+          value:
+          - '*.RELEASE-NAME-cray-service-etcd.NAMESPACE.svc'
+          - '*.RELEASE-NAME-cray-service-etcd.NAMESPACE.svc.cluster.local'
+          - RELEASE-NAME-cray-service-etcd-client.NAMESPACE.svc
+          - RELEASE-NAME-cray-service-etcd-client.NAMESPACE.svc.cluster.local
+          - localhost
+      - template: etcd-certificates.yaml
+        documentIndex: 0
+        equal:
+          path: spec.issuerRef.name
+          value: cert-manager-issuer-common
+      - template: etcd-certificates.yaml
+        documentIndex: 1
+        equal:
+          path: spec.commonName
+          value: RELEASE-NAME-cray-service-NAMESPACE-peer
+      - template: etcd-certificates.yaml
+        documentIndex: 1
+        equal:
+          path: spec.dnsNames
+          value:
+          - '*.RELEASE-NAME-cray-service-etcd.NAMESPACE.svc'
+          - '*.RELEASE-NAME-cray-service-etcd.NAMESPACE.svc.cluster.local'
+      - template: etcd-certificates.yaml
+        documentIndex: 1
+        equal:
+          path: spec.issuerRef.name
+          value: cert-manager-issuer-common
+      - template: etcd-certificates.yaml
+        documentIndex: 2
+        equal:
+          path: spec.commonName
+          value: RELEASE-NAME-cray-service-NAMESPACE-client
+      - template: etcd-certificates.yaml
+        documentIndex: 2
+        equal:
+          path: spec.dnsNames
+          value: NULL
+      - template: etcd-certificates.yaml
+        documentIndex: 2
+        equal:
+          path: spec.issuerRef.name
+          value: cert-manager-issuer-common

@@ -1,0 +1,116 @@
+---
+suite: jobs should render as expected
+templates:
+  - jobs.yaml
+tests:
+  - it: 01 - should render the correct spec values at all levels
+    values:
+      - ./values-01.yaml
+    asserts:
+      - template: jobs.yaml
+        documentIndex: 0
+        equal:
+          path: metadata.name
+          value: RELEASE-NAME-cray-jobs-job01
+      - template: jobs.yaml
+        documentIndex: 0
+        equal:
+          path: spec.parallelism
+          value: 5
+      - template: jobs.yaml
+        documentIndex: 0
+        equal:
+          path: spec.template.spec.containers[0].name
+          value: container01
+      - template: jobs.yaml
+        documentIndex: 0
+        equal:
+          path: spec.template.spec.containers[0].command[0]
+          value: test-command
+      - template: jobs.yaml
+        documentIndex: 0
+        equal:
+          path: spec.template.spec.containers[0].image
+          value: hub/job01:latest
+      - template: jobs.yaml
+        documentIndex: 0
+        equal:
+          path: spec.template.spec.containers[0].imagePullPolicy
+          value: Never
+      - template: jobs.yaml
+        documentIndex: 0
+        equal:
+          path: metadata.annotations.[helm.sh/hook]
+          value: pre-install,pre-upgrade
+      - template: jobs.yaml
+        documentIndex: 0
+        equal:
+          path: spec.template.spec.restartPolicy
+          value: OnFailure
+      - template: jobs.yaml
+        documentIndex: 0
+        equal:
+          path: metadata.annotations.[helm.sh/hook-delete-policy]
+          value: hook-succeeded
+      - template: jobs.yaml
+        documentIndex: 1
+        matchRegex:
+          path: metadata.name
+          pattern: ^RELEASE-NAME-cray-jobs-job02-[0-9]+$
+      - template: jobs.yaml
+        documentIndex: 1
+        equal:
+          path: spec.template.spec.containers[0].image
+          value: hub/job02:latest
+      - template: jobs.yaml
+        documentIndex: 1
+        equal:
+          path: spec.template.spec.containers[0].imagePullPolicy
+          value: IfNotPresent
+  - it: 02 - should render with respect to global.appVersion
+    values:
+      - ./values-02.yaml
+    asserts:
+      - template: jobs.yaml
+        documentIndex: 0
+        equal:
+          path: spec.template.spec.containers[0].image
+          value: dtr.dev.cray.com/job01:0.0.1
+      - template: jobs.yaml
+        documentIndex: 1
+        equal:
+          path: spec.template.spec.containers[0].image
+          value: dtr.dev.cray.com/job02:0.0.1
+  - it: 03 - should render initContainers and ephemeralContainers
+    values:
+      - ./values-03.yaml
+    asserts:
+      - template: jobs.yaml
+        documentIndex: 0
+        equal:
+          path: spec.template.spec.initContainers[0].image
+          value: dtr.dev.cray.com/job01-init:latest
+      - template: jobs.yaml
+        documentIndex: 0
+        equal:
+          path: spec.template.spec.ephemeralContainers[0].image
+          value: dtr.dev.cray.com/job01-ephemeral:latest
+      - template: jobs.yaml
+        documentIndex: 0
+        equal:
+          path: spec.template.spec.restartPolicy
+          value: Never
+  - it: 04 - should render default helm.sh/hook-delete-policy as before-hook-creation
+    values:
+      - ./values-04.yaml
+    asserts:
+      - template: jobs.yaml
+        documentIndex: 0
+        equal:
+          path: metadata.annotations.[helm.sh/hook-delete-policy]
+          value: before-hook-creation
+      - template: jobs.yaml
+        documentIndex: 0
+        equal:
+          path: spec.template.spec.containers[0].image
+          value: dtr.dev.cray.com/job01:0.0.1

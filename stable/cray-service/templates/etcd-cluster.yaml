@@ -1,0 +1,166 @@
+{{- if .Values.etcdCluster.enabled -}}
+---
+apiVersion: "etcd.database.coreos.com/v1beta2"
+kind: "EtcdCluster"
+version: "{{ .Values.etcdCluster.version }}"
+metadata:
+  name: "{{ include "cray-service.name" . }}-etcd"
+  labels:
+    app.kubernetes.io/name: {{ include "cray-service.name" . }}-etcd
+    {{- include "cray-service.common-labels" . | nindent 4 }}
+    {{- with .Values.etcdCluster.labels -}}
+    {{ toYaml . | nindent 4 -}}
+    {{- end }}
+  annotations:
+    etcd.database.coreos.com/scope: clusterwide
+    {{- include "cray-service.common-annotations" . | nindent 4 -}}
+    {{- with .Values.etcdCluster.annotations -}}
+    {{ toYaml . | nindent 4 -}}
+    {{- end }}
+spec:
+  size: {{ .Values.etcdCluster.size }}
+  {{- if .Values.etcdCluster.tls.enabled }}
+  TLS:
+    static:
+      member:
+        peerSecret: "{{ include "cray-service.fullname" . }}-etcd-peer-tls"
+        serverSecret: "{{ include "cray-service.fullname" . }}-etcd-server-tls"
+      operatorSecret: "{{ include "cray-service.fullname" . }}-etcd-client-tls"
+  {{- end }}
+  version: {{ .Values.etcdCluster.version }}
+  repository: "{{ include "cray-service.image-prefix" .Values }}coreos/etcd"
+  pod:
+    busyboxImage: "{{ include "cray-service.image-prefix" .Values }}library/busybox:1.28.0-glibc"
+    annotations:
+      sidecar.istio.io/inject: "false"
+    {{- with .Values.etcdCluster.nodeSelector }}
+    nodeSelector:
+      {{- toYaml . | nindent 6 }}
+    {{- end -}}
+    {{- if .Values.etcdCluster.affinity }}
+    {{- with .Values.etcdCluster.affinity }}
+    affinity:
+      {{- toYaml . | nindent 6 }}
+    {{- end -}}
+    {{- else }}
+    {{- if .Values.etcdCluster.enforceAntiAffinity }}
+    affinity:
+      podAntiAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
+            matchExpressions:
+            - key: etcd_cluster
+              operator: In
+              values: ["{{ include "cray-service.name" . }}-etcd"]
+          topologyKey: kubernetes.io/hostname
+    {{- end }}
+    {{- end }}
+    {{- if .Values.etcdCluster.pvc.enabled }}
+    persistentVolumeClaimSpec:
+      {{- if .Values.storageClass }}
+      storageClass: {{ .Values.storageClass }}
+      {{- end }}
+      accessModes:
+      - {{ .Values.etcdCluster.pvc.accessMode }}
+      resources:
+        requests:
+          {{- if .Values.etcdCluster.maxQuota }}
+          storage: 11Gi # A bit of headroom above 10GB quota max
+          {{- else }}
+          storage: {{ .Values.etcdCluster.pvc.storage }}
+          {{- end }}
+    {{- end }}
+    {{- if .Values.etcdCluster.resources }}
+    {{- with .Values.etcdCluster.resources }}
+    resources:
+      {{- toYaml . | nindent 6 }}
+    {{- end -}}
+    {{- end }}
+    etcdEnv:
+    - name: ETCD_AUTO_COMPACTION_RETENTION
+      value: "{{ .Values.etcdCluster.compactionRetention }}"
+    - name: ETCD_AUTO_COMPACTION_MODE
+      value: "{{ .Values.etcdCluster.compactionMode }}"
+    - name: ETCD_HEARTBEAT_INTERVAL
+      value: "{{ .Values.etcdCluster.heartbeatInterval }}"
+    - name: ETCD_ELECTION_TIMEOUT
+      value: "{{ .Values.etcdCluster.electionTimeout }}"
+    - name: ETCD_MAX_SNAPSHOTS
+      value: "{{ .Values.etcdCluster.snapshotMax }}"
+    - name: ETCD_SNAPSHOT_COUNT
+      value: "{{ .Values.etcdCluster.snapshotCount }}"
+    {{- if .Values.etcdCluster.maxQuota }}
+    - name: ETCD_QUOTA_BACKEND_BYTES
+      value: "10737418240" # 10GB (max supported value)
+    {{- end }}
+---
+apiVersion: "networking.istio.io/v1alpha3"
+kind: "DestinationRule"
+metadata:
+  name: "{{ include "cray-service.name" . }}-etcd-client-rule"
+  labels:
+    app.kubernetes.io/name: {{ include "cray-service.name" . }}-etcd
+    {{- include "cray-service.common-labels" . | nindent 4 }}
+  annotations:
+    {{- include "cray-service.common-annotations" . | nindent 4 }}
+spec:
+  host: "{{ include "cray-service.name" . }}-etcd-client"
+  trafficPolicy:
+    tls:
+      mode: DISABLE
+---
+apiVersion: "networking.istio.io/v1alpha3"
+kind: "DestinationRule"
+metadata:
+  name: "{{ include "cray-service.name" . }}-etcd-rule"
+  labels:
+    app.kubernetes.io/name: {{ include "cray-service.name" . }}-etcd
+    {{- include "cray-service.common-labels" . | nindent 4 }}
+  annotations:
+    {{- include "cray-service.common-annotations" . | nindent 4 }}
+spec:
+  host: "{{ include "cray-service.name" . }}-etcd"
+  trafficPolicy:
+    tls:
+      mode: DISABLE
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: "{{ include "cray-service.fullname" . }}-wait-for-etcd-{{ .Release.Revision }}"
+  labels:
+    app.kubernetes.io/name: {{ include "cray-service.fullname" . }}-wait-for-etcd
+spec:
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/inject: "false"
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: "etcd-watcher"
+          image: "{{ include "cray-service.image-prefix" .Values }}coreos/etcd:v3.3.22"
+          command:
+          - /bin/sh
+          - -c
+          {{- if .Values.etcdCluster.tls.enabled }}
+          - until etcdctl --ca-file /tls/ca.crt --cert-file /tls/tls.crt --key-file /tls/tls.key --endpoints https://$ETCD_HOST:$ETCD_PORT cluster-health; do echo "Waiting for etcd cluster"; sleep 2; done; echo 'ETCD READY';
+          {{- else }}
+          - until etcdctl --endpoints http://$ETCD_HOST:$ETCD_PORT cluster-health; do echo "Waiting for etcd cluster"; sleep 2; done; echo 'ETCD READY';
+          {{- end }}
+          env:
+            - name: ETCD_HOST
+              value: "{{ include "cray-service.fullname" . }}-etcd-client.{{ .Release.Namespace }}.svc"
+            - name: ETCD_PORT
+              value: "2379"
+      {{- if .Values.etcdCluster.tls.enabled }}
+          volumeMounts:
+          - name: tls
+            mountPath: "/tls"
+            readOnly: true
+      volumes:
+      - name: tls
+        secret:
+          secretName: "{{ include "cray-service.fullname" . }}-etcd-client-tls"
+      {{- end }}
+{{- end }}

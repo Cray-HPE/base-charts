@@ -1,0 +1,338 @@
+---
+suite: deployment test for sql enabled
+templates:
+  - postgresql.yaml
+  - deployment.yaml
+tests:
+  - it: should render 1 postgres cluster w/ 4 services (one for each pg instance), one job to wait for cluster readiness, and a cert request
+    set:
+      sqlCluster.enabled: true
+      sqlCluster.instanceCount: 4
+    asserts:
+      - template: postgresql.yaml
+        hasDocuments:
+          count: 9
+  - it: should render 1 postgres cluster w/ 4 services (one for each pg instance), one job to wait for cluster readiness and no cert request
+    set:
+      sqlCluster.enabled: true
+      sqlCluster.tls.enabled: false
+      sqlCluster.instanceCount: 4
+    asserts:
+      - template: postgresql.yaml
+        hasDocuments:
+          count: 8
+  - it: should render service(s) with the appropriate values
+    set:
+      sqlCluster.enabled: true
+      chart.name: "test-chart"
+    asserts:
+      - template: postgresql.yaml
+        documentIndex: 2
+        equal:
+          path: spec.ports[0].port
+          value: 5432
+      - template: postgresql.yaml
+        documentIndex: 2
+        equal:
+          path: metadata.labels.cluster-name
+          value: RELEASE-NAME-cray-service
+      - template: postgresql.yaml
+        documentIndex: 2
+        equal:
+          path: metadata.labels.role
+          value: pod
+  - it: should render PERMISSIVE authentication policy for the pods with the appropriate selector
+    set:
+      sqlCluster.enabled: true
+      chart.name: "test-chart"
+    asserts:
+      - template: postgresql.yaml
+        documentIndex: 5
+        equal:
+          path: kind
+          value: "PeerAuthentication"
+      - template: postgresql.yaml
+        documentIndex: 5
+        equal:
+          path: spec.selector.matchLabels.cluster-name
+          value: "RELEASE-NAME-cray-service"
+      - template: postgresql.yaml
+        documentIndex: 5
+        equal:
+          path: spec.selector.matchLabels.role
+          value: "pod"
+  - it: should render PERMISSIVE authentication policy for the service with the appropriate selector
+    set:
+      sqlCluster.enabled: true
+      chart.name: "test-chart"
+    asserts:
+      - template: postgresql.yaml
+        documentIndex: 6
+        equal:
+          path: kind
+          value: "PeerAuthentication"
+      - template: postgresql.yaml
+        documentIndex: 6
+        equal:
+          path: spec.selector.matchLabels.cluster-name
+          value: "RELEASE-NAME-cray-service-postgres"
+      - template: postgresql.yaml
+        documentIndex: 6
+        equal:
+          path: spec.selector.matchLabels.application
+          value: "spilo"
+      - template: postgresql.yaml
+        documentIndex: 6
+        equal:
+          path: spec.selector.matchLabels.team
+          value: "RELEASE-NAME-cray-service"
+  - it: renders the Job that waits for postgres
+    set:
+      sqlCluster.enabled: true
+      chart.name: "test-chart"
+    asserts:
+      - template: postgresql.yaml
+        documentIndex: 7
+        equal:
+          path: metadata.name
+          value: RELEASE-NAME-cray-service-wait-for-postgres-0
+      - template: postgresql.yaml
+        documentIndex: 7
+        equal:
+          path: spec.template.spec.containers[0].resources.requests.cpu
+          value: 100m
+      - template: postgresql.yaml
+        documentIndex: 7
+        equal:
+          path: spec.template.spec.containers[0].resources.requests.memory
+          value: 10Mi
+      - template: postgresql.yaml
+        documentIndex: 7
+        equal:
+          path: spec.template.spec.containers[0].resources.limits.cpu
+          value: 500m
+      - template: postgresql.yaml
+        documentIndex: 7
+        equal:
+          path: spec.template.spec.containers[0].resources.limits.memory
+          value: 100Mi
+  - it: should create a certificate request
+    set:
+      sqlCluster.enabled: true
+      sqlCluster.tls.enabled: true
+      chart.name: "test-chart"
+    asserts:
+      - template: postgresql.yaml
+        documentIndex: 0
+        equal:
+          path: metadata.name
+          value: RELEASE-NAME-cray-service-postgres-tls
+      - template: postgresql.yaml
+        documentIndex: 0
+        equal:
+          path: spec.secretName
+          value: RELEASE-NAME-cray-service-postgres-tls
+      - template: postgresql.yaml
+        documentIndex: 0
+        equal:
+          path: spec.commonName
+          value: RELEASE-NAME-cray-service-postgres.NAMESPACE.cluster.svc
+      - template: postgresql.yaml
+        documentIndex: 0
+        equal:
+          path: spec.dnsNames
+          value:
+            - RELEASE-NAME-cray-service-postgres.NAMESPACE.cluster.svc
+            - RELEASE-NAME-cray-service-postgres.NAMESPACE
+            - "*.RELEASE-NAME-cray-service-postgres.NAMESPACE"
+      - template: postgresql.yaml
+        documentIndex: 0
+        equal:
+          path: spec.issuerRef.name
+          value: cert-manager-issuer-common
+  - it: should enable tls using the correct secret
+    set:
+      sqlCluster.enabled: true
+      sqlCluster.tls.enabled: true
+      chart.name: "test-chart"
+    asserts:
+      - template: postgresql.yaml
+        documentIndex: 1
+        equal:
+          path: spec.tls.secretName
+          value: RELEASE-NAME-cray-service-postgres-tls
+  - it: should include POSTGRES_* values in the container
+    set:
+      sqlCluster.enabled: true
+      chart.name: "test-chart"
+      containers:
+        test-service:
+          name: test-service
+          image:
+            repository: test-service
+    asserts:
+      - template: deployment.yaml
+        equal:
+          path: spec.template.spec.containers[0].env[0].value
+          value: cray-service-postgres
+      - template: deployment.yaml
+        equal:
+          path: spec.template.spec.containers[0].env[1].value
+          value: "5432"
+  - it: should include secrets mount for each postgres DB
+    set:
+      sqlCluster:
+        enabled: true
+        users:
+          user1: []
+          user2: []
+        databases:
+          db1: user1
+          db2: user2
+      containers:
+        test-service:
+          name: test-service
+          image:
+            repository: test-service
+    asserts:
+      - template: deployment.yaml
+        matchRegex:
+          path: spec.template.spec.containers[0].volumeMounts[0].name
+          pattern: "(user1|user2|service-account)-postgres-secrets"
+      - template: deployment.yaml
+        matchRegex:
+          path: spec.template.spec.containers[0].volumeMounts[0].mountPath
+          pattern: /secrets/postgres/(user1|user2|service_account)
+      - template: deployment.yaml
+        matchRegex:
+          path: spec.template.spec.containers[0].volumeMounts[1].name
+          pattern: (user1|user2|service-account)-postgres-secrets
+      - template: deployment.yaml
+        matchRegex:
+          path: spec.template.spec.containers[0].volumeMounts[1].mountPath
+          pattern: /secrets/postgres/(user1|user2|service_account)
+  - it: should prepend secrets mount for each postgres DB if other volumeMounts exist
+    set:
+      sqlCluster:
+        enabled: true
+        users:
+          user1: []
+        databases:
+          db1: user1
+          service_account: service_db
+      containers:
+        test-service:
+          name: test-service
+          image:
+            repository: test-service
+          volumeMounts:
+            - name: test-mount
+              mountPath: /my-path
+    asserts:
+      - template: deployment.yaml
+        matchRegex:
+          path: spec.template.spec.containers[0].volumeMounts[0].name
+          pattern: (user1|service-account)-postgres-secrets
+      - template: deployment.yaml
+        matchRegex:
+          path: spec.template.spec.containers[0].volumeMounts[0].mountPath
+          pattern: /secrets/postgres/(user1|service_account)
+      - template: deployment.yaml
+        matchRegex:
+          path: spec.template.spec.containers[0].volumeMounts[1].name
+          pattern: (user1|service-account)-postgres-secrets
+      - template: deployment.yaml
+        matchRegex:
+          path: spec.template.spec.containers[0].volumeMounts[1].mountPath
+          pattern: /secrets/postgres/(user1|service_account)
+      - template: deployment.yaml
+        equal:
+          path: spec.template.spec.containers[0].volumeMounts[2].name
+          value: test-mount
+      - template: deployment.yaml
+        equal:
+          path: spec.template.spec.containers[0].volumeMounts[2].mountPath
+          value: /my-path
+  - it: should include an init container that waits for the readiness watcher job
+    set:
+      sqlCluster.enabled: true
+      chart.name: "test-chart"
+      imagesHost: "my-repo"
+      containers:
+        test-service:
+          name: test-service
+          image:
+            repository: test-service
+    asserts:
+      - template: deployment.yaml
+        equal:
+          path: spec.template.spec.initContainers[0].name
+          value: RELEASE-NAME-cray-service-wait-for-postgres
+      - template: deployment.yaml
+        equal:
+          path: spec.template.spec.initContainers[0].image
+          value: "my-repo/loftsman/docker-kubectl:latest"
+      - template: deployment.yaml
+        equal:
+          path: spec.template.spec.serviceAccountName
+          value: jobs-watcher
+      - template: deployment.yaml
+        equal:
+          path: spec.template.spec.initContainers[0].resources.requests.cpu
+          value: 30m
+      - template: deployment.yaml
+        equal:
+          path: spec.template.spec.initContainers[0].resources.requests.memory
+          value: 20Mi
+      - template: deployment.yaml
+        equal:
+          path: spec.template.spec.initContainers[0].resources.limits.cpu
+          value: 500m
+      - template: deployment.yaml
+        equal:
+          path: spec.template.spec.initContainers[0].resources.limits.memory
+          value: 100Mi
+  - it: should include sql compute resources when specified for the postgres pods
+    set:
+      sqlCluster.enabled: true
+      sqlCluster.resources:
+        limits:
+          cpu: "2"
+          memory: 2Gi
+        requests:
+          cpu: 11m
+          memory: 44Mi
+    asserts:
+      - template: postgresql.yaml
+        documentIndex: 1
+        equal:
+          path: spec.resources.limits.cpu
+          value: 2
+        equal:
+          path: spec.resources.limits.memory
+          value: 2Gi
+        equal:
+          path: spec.resources.requests.cpu
+          value: 11m
+        equal:
+          path: spec.resources.requests.memory
+          value: 44Mi
+  - it: should include postgres parameters when specified
+    set:
+      sqlCluster.enabled: true
+      sqlCluster.parameters:
+        shared_buffers: "33MB"
+        max_connections: "11"
+        log_statement: "foo"
+    asserts:
+      - template: postgresql.yaml
+        documentIndex: 1
+        equal:
+          path: spec.postgresql.parameters.shared_buffers
+          value: 33MB
+        equal:
+          path: spec.postgresql.parameters.max_connections
+          value: 11
+        equal:
+          path: spec.postgresql.parameters.log_statement
+          value: foo

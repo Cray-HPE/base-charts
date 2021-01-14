@@ -1,0 +1,383 @@
+---
+suite: deployment all container fields test
+templates:
+  - deployment.yaml
+tests:
+  - it: should render the correct image values
+    set:
+      imagesHost: "hub"
+      containers:
+        test-service:
+          name: test-service
+          image:
+            repository: test-service
+            tag: 0.0.1
+            pullPolicy: Never
+    asserts:
+      - template: deployment.yaml
+        equal:
+          path: spec.template.spec.containers[0].image
+          value: "hub/test-service:0.0.1"
+      - template: deployment.yaml
+        equal:
+          path: spec.template.spec.containers[0].imagePullPolicy
+          value: Never
+  - it: should render the correct command and arg values
+    set:
+      containers:
+        test-service:
+          name: test-service
+          image:
+            repository: test-service
+          command: ["one", "two"]
+          args: ["three", "four"]
+    asserts:
+      - template: deployment.yaml
+        equal:
+          path: spec.template.spec.containers[0].command
+          value:
+            - one
+            - two
+      - template: deployment.yaml
+        equal:
+          path: spec.template.spec.containers[0].args
+          value:
+            - three
+            - four
+  - it: should render the correct env values
+    set:
+      containers:
+        test-service:
+          name: test-service
+          image:
+            repository: test-service
+          env:
+            - name: ONE
+              value: "ONE"
+            - name: TWO
+              value: "TWO"
+    asserts:
+      - template: deployment.yaml
+        equal:
+          path: spec.template.spec.containers[0].env[0].value
+          value: ONE
+      - template: deployment.yaml
+        equal:
+          path: spec.template.spec.containers[0].env[1].value
+          value: TWO
+  - it: should render the correct envFrom values
+    set:
+      containers:
+        test-service:
+          name: test-service
+          image:
+            repository: test-service
+          envFrom:
+            - configMapRef:
+                name: special-config
+    asserts:
+      - template: deployment.yaml
+        equal:
+          path: spec.template.spec.containers[0].envFrom[0].configMapRef.name
+          value: special-config
+  - it: should render the correct ports values
+    set:
+      containers:
+        test-service:
+          name: test-service
+          image:
+            repository: test-service
+          ports:
+            - name: myport
+              containerPort: 90000
+              protocol: UDP
+    asserts:
+      - template: deployment.yaml
+        equal:
+          path: spec.template.spec.containers[0].ports[0].name
+          value: myport
+      - template: deployment.yaml
+        equal:
+          path: spec.template.spec.containers[0].ports[0].containerPort
+          value: 90000
+      - template: deployment.yaml
+        equal:
+          path: spec.template.spec.containers[0].ports[0].protocol
+          value: UDP
+  - it: should render the correct probe values
+    set:
+      containers:
+        test-service:
+          name: test-service
+          image:
+            repository: test-service
+          livenessProbe:
+            httpGet:
+              path: /path
+              port: 8000
+            initialDelaySeconds: 10
+            periodSeconds: 11
+          readinessProbe:
+            httpGet:
+              path: /path-ready
+              port: 8100
+            initialDelaySeconds: 12
+            periodSeconds: 13
+    asserts:
+      - template: deployment.yaml
+        equal:
+          path: spec.template.spec.containers[0].livenessProbe.httpGet.path
+          value: /path
+      - template: deployment.yaml
+        equal:
+          path: spec.template.spec.containers[0].livenessProbe.httpGet.port
+          value: 8000
+      - template: deployment.yaml
+        equal:
+          path: spec.template.spec.containers[0].livenessProbe.initialDelaySeconds
+          value: 10
+      - template: deployment.yaml
+        equal:
+          path: spec.template.spec.containers[0].livenessProbe.periodSeconds
+          value: 11
+      - template: deployment.yaml
+        equal:
+          path: spec.template.spec.containers[0].readinessProbe.httpGet.path
+          value: /path-ready
+      - template: deployment.yaml
+        equal:
+          path: spec.template.spec.containers[0].readinessProbe.httpGet.port
+          value: 8100
+      - template: deployment.yaml
+        equal:
+          path: spec.template.spec.containers[0].readinessProbe.initialDelaySeconds
+          value: 12
+      - template: deployment.yaml
+        equal:
+          path: spec.template.spec.containers[0].readinessProbe.periodSeconds
+          value: 13
+  - it: should render the correct volume mounts
+    set:
+      containers:
+        test-service:
+          name: test-service
+          image:
+            repository: test-service
+          volumeMounts:
+            - name: test-mount
+              mountPath: /my-path
+    asserts:
+      - template: deployment.yaml
+        equal:
+          path: spec.template.spec.containers[0].volumeMounts[0].name
+          value: test-mount
+      - template: deployment.yaml
+        equal:
+          path: spec.template.spec.containers[0].volumeMounts[0].mountPath
+          value: /my-path
+  - it: should render the correct resources values
+    set:
+      containers:
+        - name: test-service
+          image:
+            repository: test-service
+          resources:
+            requests:
+              memory: "64Mi"
+    asserts:
+      - template: deployment.yaml
+        equal:
+          path: spec.template.spec.containers[0].resources.requests.memory
+          value: "64Mi"
+  - it: should render the correct security context
+    set:
+      containers:
+        - name: test-service
+          image:
+            repository: test-service
+          securityContext:
+            allowPrivilegeEscalation: false
+    asserts:
+      - template: deployment.yaml
+        equal:
+          path: spec.template.spec.containers[0].securityContext.allowPrivilegeEscalation
+          value: false
+  - it: should render the correct stdin values, termination message path, tty, and workingDir
+    set:
+      containers:
+        test-service:
+          name: test-service
+          image:
+            repository: test-service
+          stdin: true
+          stdinOnce: true
+          terminationMessagePath: "/term-message-path"
+          tty: true
+          workingDir: "/workingdir"
+    asserts:
+      - template: deployment.yaml
+        equal:
+          path: spec.template.spec.containers[0].stdin
+          value: true
+      - template: deployment.yaml
+        equal:
+          path: spec.template.spec.containers[0].stdinOnce
+          value: true
+      - template: deployment.yaml
+        equal:
+          path: spec.template.spec.containers[0].terminationMessagePath
+          value: /term-message-path
+      - template: deployment.yaml
+        equal:
+          path: spec.template.spec.containers[0].tty
+          value: true
+      - template: deployment.yaml
+        equal:
+          path: spec.template.spec.containers[0].workingDir
+          value: /workingdir
+  - it: should render the correct volumeDevices
+    set:
+      containers:
+        test-service:
+          name: test-service
+          image:
+            repository: test-service
+          volumeDevices:
+            - name: test-volume-device
+              devicePath: /dev/volume
+    asserts:
+      - template: deployment.yaml
+        equal:
+          path: spec.template.spec.containers[0].volumeDevices[0].name
+          value: test-volume-device
+  - it: should set fsGroup
+    set:
+      containers:
+        test-service:
+          name: test-service
+          image:
+            repository: test-service
+      securityContext:
+        fsGroup: 456
+    asserts:
+      - template: deployment.yaml
+        equal:
+          path: spec.template.spec.securityContext.fsGroup
+          value: 456
+  - it: should set runAsUser
+    set:
+      containers:
+        test-service:
+          name: test-service
+          image:
+            repository: test-service
+      securityContext:
+        runAsUser: 101
+    asserts:
+      - template: deployment.yaml
+        equal:
+          path: spec.template.spec.securityContext.runAsUser
+          value: 101
+  - it: should set runAsUser and runAsGroup
+    set:
+      containers:
+        test-service:
+          name: test-service
+          image:
+            repository: test-service
+      securityContext:
+        runAsUser: 101
+        runAsGroup: 202
+    asserts:
+      - template: deployment.yaml
+        equal:
+          path: spec.template.spec.securityContext.runAsUser
+          value: 101
+      - template: deployment.yaml
+        equal:
+          path: spec.template.spec.securityContext.runAsGroup
+          value: 202
+  - it: should set runAsNotRoot
+    set:
+      containers:
+        test-service:
+          name: test-service
+          image:
+            repository: test-service
+      securityContext:
+        runAsNonRoot: true
+    asserts:
+      - template: deployment.yaml
+        equal:
+          path: spec.template.spec.securityContext.runAsNonRoot
+          value: true
+  - it: should set supplementalGroups
+    set:
+      containers:
+        test-service:
+          name: test-service
+          image:
+            repository: test-service
+      securityContext:
+        supplementalGroups:
+          - 1400
+          - 1500
+          - 1600
+    asserts:
+      - template: deployment.yaml
+        equal:
+          path: spec.template.spec.securityContext.supplementalGroups[0]
+          value: 1400
+      - template: deployment.yaml
+        equal:
+          path: spec.template.spec.securityContext.supplementalGroups[1]
+          value: 1500
+      - template: deployment.yaml
+        equal:
+          path: spec.template.spec.securityContext.supplementalGroups[2]
+          value: 1600
+  - it: should set full securityContext
+    set:
+      containers:
+        test-service:
+          name: test-service
+          image:
+            repository: test-service
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 101
+        runAsGroup: 1001
+        fsGroup: 1001
+        supplementalGroups:
+          - 1400
+          - 1500
+          - 1600
+    asserts:
+      - template: deployment.yaml
+        equal:
+          path: spec.template.spec.securityContext.runAsNonRoot
+          value: true
+      - template: deployment.yaml
+        equal:
+          path: spec.template.spec.securityContext.runAsUser
+          value: 101
+      - template: deployment.yaml
+        equal:
+          path: spec.template.spec.securityContext.runAsGroup
+          value: 1001
+      - template: deployment.yaml
+        equal:
+          path: spec.template.spec.securityContext.fsGroup
+          value: 1001
+      - template: deployment.yaml
+        equal:
+          path: spec.template.spec.securityContext.supplementalGroups[0]
+          value: 1400
+      - template: deployment.yaml
+        equal:
+          path: spec.template.spec.securityContext.supplementalGroups[1]
+          value: 1500
+      - template: deployment.yaml
+        equal:
+          path: spec.template.spec.securityContext.supplementalGroups[2]
+          value: 1600

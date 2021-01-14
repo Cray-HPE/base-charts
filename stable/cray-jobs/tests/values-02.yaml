@@ -1,0 +1,20 @@
+global:
+  appVersion: 0.0.1
+jobs:
+  job01:
+    parallelism: 5
+    template:
+      spec:
+        containers:
+          container01:
+            command: ["test-command"]
+            image:
+              repository: job01
+              pullPolicy: Never
+  job02:
+    template:
+      spec:
+        containers:
+          container01:
+            image:
+              repository: job02
