@@ -25,6 +25,23 @@ pipeline {
       }
     }
 
+    stage('Push to github') {
+        when { allOf {
+            # Regex can be changed, as exampled above, to only run specific branches instead of all
+            expression { BRANCH_NAME ==~ /.*/ }
+        }}
+        steps {
+            script {
+                pushToGithub(
+                    githubRepo: "Cray-HPE/cray-charts",
+                    pemSecretId: "githubapp-stash-sync",
+                    githubAppId: "91129",
+                    githubAppInstallationId: "13313749"
+                )
+            }
+        }
+    }
+
   }
 
   post {
