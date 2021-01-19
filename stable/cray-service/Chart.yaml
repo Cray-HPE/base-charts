@@ -2,4 +2,4 @@ apiVersion: v1
 description: This chart should never be installed directly, base your specific Cray service charts off this one
 name: cray-service
 home: "cloud/cray-charts"
-version: 2.4.1
+version: 2.4.2
