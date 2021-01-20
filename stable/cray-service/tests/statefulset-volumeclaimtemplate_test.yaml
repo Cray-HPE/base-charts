@@ -17,18 +17,6 @@ tests:
         equal:
           path: spec.replicas
           value: 1
-      - template: statefulset.yaml
-        equal:
-          path: spec.volumeClaimTemplates.spec.resources.requests.storage
-          value: 1Gi
-      - template: statefulset.yaml
-        equal:
-          path: spec.volumeClaimTemplates.spec.storageClassName
-          value: ""
-      - template: statefulset.yaml
-        equal:
-          path: spec.volumeClaimTemplates.metadata.name
-          value: "cray-service"
   - it: volumeClaimTemplate filled correctly
     set:
       type: StatefulSet
