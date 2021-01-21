@@ -33,7 +33,7 @@ spec:
       name: {{ include "cray-service.name" . }}
       {{- end }}
     spec:
-      accessModes: [ "ReadWriteOnce" ]
+      accessModes: {{ .Values.volumeClaimTemplate.accessModes }}
       resources:
         requests:
           storage: {{ .Values.volumeClaimTemplate.resources.requests.storage }}

@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [2.4.1]
+### Changed
+- The volumeClaimTemplate section for the statefulset template is optional. The entire section is included only if configured in values.yaml
+
 ## [2.4.0]
 ### Changed
 - The statefulset template now includes the volumeClaimTemplate section, and the default values file is updated with a default case. This is used to create the pvc items for each replica. The pvs will be created using the specified storage class; if none is specified, the global value will be used, and if that is also not set, the default class will be used. 
