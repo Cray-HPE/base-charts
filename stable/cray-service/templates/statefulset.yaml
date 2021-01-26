@@ -26,7 +26,7 @@ spec:
       {{- include "cray-service.common-spec" . | nindent 6 }}
   {{- if .Values.volumeClaimTemplate.name }}
   volumeClaimTemplates:
-    metadata:
+  - metadata:
       {{- if .Values.volumeClaimTemplate.name }}
       name: {{ .Values.volumeClaimTemplate.name }}
       {{- else }}
