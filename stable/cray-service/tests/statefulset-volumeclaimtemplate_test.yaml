@@ -35,15 +35,15 @@ tests:
           value: 1
       - template: statefulset.yaml
         equal:
-          path: spec.volumeClaimTemplates.spec.resources.requests.storage
+          path: spec.volumeClaimTemplates[0].spec.resources.requests.storage
           value: 1Gi
       - template: statefulset.yaml
         equal:
-          path: spec.volumeClaimTemplates.metadata.name
+          path: spec.volumeClaimTemplates[0].metadata.name
           value: "BigStorage"
       - template: statefulset.yaml
         equal:
-          path: spec.volumeClaimTemplates.spec.storageClassName
+          path: spec.volumeClaimTemplates[0].spec.storageClassName
           value: ""
 
   - it: volumeClaimTemplate filled correctly
@@ -66,15 +66,15 @@ tests:
           value: 3
       - template: statefulset.yaml
         equal:
-          path: spec.volumeClaimTemplates.spec.resources.requests.storage
+          path: spec.volumeClaimTemplates[0].spec.resources.requests.storage
           value: 2Gi
       - template: statefulset.yaml
         equal:
-          path: spec.volumeClaimTemplates.spec.storageClassName
+          path: spec.volumeClaimTemplates[0].spec.storageClassName
           value: "BigStorageClass"
       - template: statefulset.yaml
         equal:
-          path: spec.volumeClaimTemplates.metadata.name
+          path: spec.volumeClaimTemplates[0].metadata.name
           value: "BigStorage"
 
 
