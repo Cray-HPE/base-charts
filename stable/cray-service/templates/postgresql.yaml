@@ -133,7 +133,7 @@ spec:
         {{- $database := . }}
         {{- $user := index $root.Values.sqlCluster.databases $database }}
         - name: "postgres-watcher-{{ $database | replace "_" "-" }}"
-          image: "{{ include "cray-service.image-prefix" $root.Values }}cache/postgres:10.3"
+          image: "{{ include "cray-service.image-prefix" $root.Values }}cache/postgres:13.2"
           command: ["sh", "-c", "until psql postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@$POSTGRES_HOST:$POSTGRES_PORT/$POSTGRES_DB -c 'select version();'; do echo waiting for postgres db $POSTGRES_DB; sleep 2; done;  echo 'POSTGRES_READY';"]
           env:
           - name: POSTGRES_USER
