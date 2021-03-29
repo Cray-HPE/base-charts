@@ -2,4 +2,4 @@ apiVersion: v1
 description: This chart should never be installed directly, use it as a subchart in any chart that has related jobs it needs to run/maintain
 name: cray-jobs
 home: "spet/cray-charts/stable/cray-jobs"
-version: 0.3.0
+version: 0.2.2
