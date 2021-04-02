@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [2.4.5]
+### Changed
+- The cache/postgres image was updated to pick up fixes for security vulnerabilities
+
 ## [2.4.1]
 ### Changed
 - The volumeClaimTemplate section for the statefulset template is optional. The entire section is included only if configured in values.yaml
