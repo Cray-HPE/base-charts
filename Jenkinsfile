@@ -13,7 +13,7 @@ pipeline {
 
     stage('Package') {
       steps {
-        packageHelmCharts(chartsPath: "${env.WORKSPACE}/stable",
+        packageHelmCharts(chartsPath: "${env.WORKSPACE}/kubernetes",
                           buildResultsPath: "${env.WORKSPACE}/build/results",
                           buildDate: "${env.BUILD_DATE}")
       }
@@ -21,7 +21,7 @@ pipeline {
 
     stage('Publish') {
       steps {
-        publishHelmCharts(chartsPath: "${env.WORKSPACE}/stable")
+        publishHelmCharts(chartsPath: "${env.WORKSPACE}/kubernetes")
       }
     }
 
@@ -32,7 +32,7 @@ pipeline {
         steps {
             script {
                 pushToGithub(
-                    githubRepo: "Cray-HPE/cray-charts",
+                    githubRepo: "Cray-HPE/base-charts",
                     pemSecretId: "githubapp-stash-sync",
                     githubAppId: "91129",
                     githubAppInstallationId: "13313749"
