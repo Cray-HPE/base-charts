@@ -115,7 +115,7 @@ tests:
         documentIndex: 7
         equal:
           path: spec.template.spec.containers[0].resources.limits.memory
-          value: 100Mi
+          value: 1Gi
   - it: should create a certificate request
     set:
       sqlCluster.enabled: true
