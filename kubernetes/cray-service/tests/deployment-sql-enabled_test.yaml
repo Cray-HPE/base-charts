@@ -121,6 +121,19 @@ tests:
         equal:
           path: spec.template.spec.containers[0].resources.limits.memory
           value: 1Gi
+      - template: postgresql.yaml
+        hasDocuments:
+          count: 8
+  - it: does not render the Job that waits for postgres when disabled
+    set:
+      sqlCluster.enabled: true
+      sqlCluster.tls.enabled: true
+      sqlCluster.waitForItJob: false
+      chart.name: "test-chart"
+    asserts:
+      - template: postgresql.yaml
+        hasDocuments:
+          count: 7
   - it: should create a certificate request
     set:
       sqlCluster.enabled: true
@@ -326,14 +339,13 @@ tests:
   - it: should include postgres parameters when specified
     set:
       sqlCluster.enabled: true
-      sqlCluster.tls.enabled: true
       sqlCluster.parameters:
         shared_buffers: "33MB"
         max_connections: "11"
         log_statement: "foo"
     asserts:
       - template: postgresql.yaml
-        documentIndex: 1
+        documentIndex: 0
         equal:
           path: spec.postgresql.parameters.shared_buffers
           value: 33MB
@@ -343,3 +355,22 @@ tests:
         equal:
           path: spec.postgresql.parameters.log_statement
           value: foo
+  - it: should include postgres connection pooler when enabled
+    set:
+      sqlCluster.enabled: true
+      sqlCluster.connectionPooler.enabled: true
+    asserts:
+      - template: postgresql.yaml
+        documentIndex: 0
+        equal:
+          path: spec.enableConnectionPooler
+          value: true
+        equal:
+          path: spec.connectionPooler.numberOfInstances
+          value: 3
+        equal:
+          path: spec.connectionPooler.mode
+          value: session
+        equal:
+          path: spec.connectionPooler.dockerImage
+          value: "registry.opensource.zalan.do/acid/pgbouncer:master-17"
