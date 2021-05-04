@@ -124,6 +124,7 @@ spec:
   portLevelMtls:
     5432:
       mode: PERMISSIVE
+{{- if .Values.sqlCluster.waitForItJob -}}
 ---
 apiVersion: batch/v1
 kind: Job
@@ -167,4 +168,5 @@ spec:
               cpu: 500m
               memory: "1Gi"
         {{- end }}
+{{- end }}
 {{- end }}
