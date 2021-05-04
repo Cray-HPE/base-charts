@@ -7,6 +7,7 @@ tests:
   - it: should render 1 postgres cluster w/ 4 services (one for each pg instance), one job to wait for cluster readiness, and a cert request
     set:
       sqlCluster.enabled: true
+      sqlCluster.tls.enabled: true
       sqlCluster.instanceCount: 4
     asserts:
       - template: postgresql.yaml
@@ -24,6 +25,7 @@ tests:
   - it: should render service(s) with the appropriate values
     set:
       sqlCluster.enabled: true
+      sqlCluster.tls.enabled: true
       chart.name: "test-chart"
     asserts:
       - template: postgresql.yaml
@@ -44,6 +46,7 @@ tests:
   - it: should render PERMISSIVE authentication policy for the pods with the appropriate selector
     set:
       sqlCluster.enabled: true
+      sqlCluster.tls.enabled: true
       chart.name: "test-chart"
     asserts:
       - template: postgresql.yaml
@@ -64,6 +67,7 @@ tests:
   - it: should render PERMISSIVE authentication policy for the service with the appropriate selector
     set:
       sqlCluster.enabled: true
+      sqlCluster.tls.enabled: true
       chart.name: "test-chart"
     asserts:
       - template: postgresql.yaml
@@ -89,6 +93,7 @@ tests:
   - it: renders the Job that waits for postgres
     set:
       sqlCluster.enabled: true
+      sqlCluster.tls.enabled: true
       chart.name: "test-chart"
     asserts:
       - template: postgresql.yaml
@@ -295,6 +300,7 @@ tests:
   - it: should include sql compute resources when specified for the postgres pods
     set:
       sqlCluster.enabled: true
+      sqlCluster.tls.enabled: true
       sqlCluster.resources:
         limits:
           cpu: "2"
@@ -320,6 +326,7 @@ tests:
   - it: should include postgres parameters when specified
     set:
       sqlCluster.enabled: true
+      sqlCluster.tls.enabled: true
       sqlCluster.parameters:
         shared_buffers: "33MB"
         max_connections: "11"
