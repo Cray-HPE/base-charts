@@ -188,7 +188,7 @@ sqlCluster:
   databases:
     service_db: service_account
   tls:
-    enabled: true
+    enabled: false
     issuer: cert-manager-issuer-common
   connectionPooler:
     enabled: false
