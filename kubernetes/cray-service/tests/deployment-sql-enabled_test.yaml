@@ -7,6 +7,7 @@ tests:
   - it: should render 1 postgres cluster w/ 4 services (one for each pg instance), one job to wait for cluster readiness, and a cert request
     set:
       sqlCluster.enabled: true
+      sqlCluster.tls.enabled: true
       sqlCluster.instanceCount: 4
     asserts:
       - template: postgresql.yaml
@@ -24,6 +25,7 @@ tests:
   - it: should render service(s) with the appropriate values
     set:
       sqlCluster.enabled: true
+      sqlCluster.tls.enabled: true
       chart.name: "test-chart"
     asserts:
       - template: postgresql.yaml
@@ -44,6 +46,7 @@ tests:
   - it: should render PERMISSIVE authentication policy for the pods with the appropriate selector
     set:
       sqlCluster.enabled: true
+      sqlCluster.tls.enabled: true
       chart.name: "test-chart"
     asserts:
       - template: postgresql.yaml
@@ -64,6 +67,7 @@ tests:
   - it: should render PERMISSIVE authentication policy for the service with the appropriate selector
     set:
       sqlCluster.enabled: true
+      sqlCluster.tls.enabled: true
       chart.name: "test-chart"
     asserts:
       - template: postgresql.yaml
@@ -89,6 +93,7 @@ tests:
   - it: renders the Job that waits for postgres
     set:
       sqlCluster.enabled: true
+      sqlCluster.tls.enabled: true
       chart.name: "test-chart"
     asserts:
       - template: postgresql.yaml
@@ -116,6 +121,19 @@ tests:
         equal:
           path: spec.template.spec.containers[0].resources.limits.memory
           value: 1Gi
+      - template: postgresql.yaml
+        hasDocuments:
+          count: 8
+  - it: does not render the Job that waits for postgres when disabled
+    set:
+      sqlCluster.enabled: true
+      sqlCluster.tls.enabled: true
+      sqlCluster.waitForItJob: false
+      chart.name: "test-chart"
+    asserts:
+      - template: postgresql.yaml
+        hasDocuments:
+          count: 7
   - it: should create a certificate request
     set:
       sqlCluster.enabled: true
@@ -295,6 +313,7 @@ tests:
   - it: should include sql compute resources when specified for the postgres pods
     set:
       sqlCluster.enabled: true
+      sqlCluster.tls.enabled: true
       sqlCluster.resources:
         limits:
           cpu: "2"
@@ -326,7 +345,7 @@ tests:
         log_statement: "foo"
     asserts:
       - template: postgresql.yaml
-        documentIndex: 1
+        documentIndex: 0
         equal:
           path: spec.postgresql.parameters.shared_buffers
           value: 33MB
@@ -336,3 +355,22 @@ tests:
         equal:
           path: spec.postgresql.parameters.log_statement
           value: foo
+  - it: should include postgres connection pooler when enabled
+    set:
+      sqlCluster.enabled: true
+      sqlCluster.connectionPooler.enabled: true
+    asserts:
+      - template: postgresql.yaml
+        documentIndex: 0
+        equal:
+          path: spec.enableConnectionPooler
+          value: true
+        equal:
+          path: spec.connectionPooler.numberOfInstances
+          value: 3
+        equal:
+          path: spec.connectionPooler.mode
+          value: session
+        equal:
+          path: spec.connectionPooler.dockerImage
+          value: "registry.opensource.zalan.do/acid/pgbouncer:master-17"

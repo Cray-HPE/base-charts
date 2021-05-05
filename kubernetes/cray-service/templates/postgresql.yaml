@@ -59,6 +59,14 @@ spec:
     {{ toYaml . | nindent 4 -}}
     {{- end }}
 
+  {{- if .Values.sqlCluster.connectionPooler.enabled }}
+  enableConnectionPooler: true
+  connectionPooler:
+    numberOfInstances: {{ .Values.sqlCluster.connectionPooler.instanceCount }}
+    mode: "{{ .Values.sqlCluster.connectionPooler.mode }}"
+    dockerImage: "{{ .Values.sqlCluster.connectionPooler.image }}"
+  {{- end }}
+
   postgresql:
     version: {{ .Values.sqlCluster.postgresVersion | default "11" | quote }}
     {{- if .Values.sqlCluster.parameters }}
@@ -117,6 +125,7 @@ spec:
   portLevelMtls:
     5432:
       mode: PERMISSIVE
+{{- if .Values.sqlCluster.waitForItJob }}
 ---
 apiVersion: batch/v1
 kind: Job
@@ -160,4 +169,5 @@ spec:
               cpu: 500m
               memory: "1Gi"
         {{- end }}
+{{- end }}
 {{- end }}
