@@ -179,6 +179,7 @@ ingress:
 
 sqlCluster:
   enabled: false
+  waitForItJob: true
   instanceCount: 3
   postgresVersion: "11"
   volumeSize: 1Gi
@@ -187,8 +188,13 @@ sqlCluster:
   databases:
     service_db: service_account
   tls:
-    enabled: true
+    enabled: false
     issuer: cert-manager-issuer-common
+  connectionPooler:
+    enabled: false
+    instanceCount: 3
+    mode: "session"
+    image: "registry.opensource.zalan.do/acid/pgbouncer:master-17"
   #
   # Consumers of this chart can override postgres cluster pod resource limits as follows:
   #

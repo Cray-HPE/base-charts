@@ -28,7 +28,7 @@ spec:
       serviceAccountName: "kafka-topics-watcher"
       containers:
         - name: "wait-for-kafka-topics"
-          image: "{{ include "cray-service.image-prefix" .Values }}loftsman/docker-kubectl"
+          image: "{{ include "cray-service.image-prefix" .Values }}loftsman/docker-kubectl:0.2.0"
           command:
             - /bin/sh
             - -c
