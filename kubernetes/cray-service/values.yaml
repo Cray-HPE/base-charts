@@ -194,7 +194,7 @@ sqlCluster:
     enabled: false
     instanceCount: 3
     mode: "session"
-    image: "registry.opensource.zalan.do/acid/pgbouncer:master-17"
+    image: "dtr.dev.cray.com/acid/pgbouncer:master-17"
   #
   # Consumers of this chart can override postgres cluster pod resource limits as follows:
   #
