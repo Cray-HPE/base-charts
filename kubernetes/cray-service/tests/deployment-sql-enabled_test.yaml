@@ -373,4 +373,4 @@ tests:
           value: session
         equal:
           path: spec.connectionPooler.dockerImage
-          value: "registry.opensource.zalan.do/acid/pgbouncer:master-17"
+          value: "dtr.dev.cray.com/acid/pgbouncer:master-17"
