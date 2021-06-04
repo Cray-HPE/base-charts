@@ -170,4 +170,85 @@ spec:
               memory: "1Gi"
         {{- end }}
 {{- end }}
+{{- if .Values.sqlCluster.connectionPooler.enabled }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "cray-service.fullname" $root }}-postgres-sqlscripts
+  labels:
+    app.kubernetes.io/name: {{ include "cray-service.fullname" . }}-postgres
+    {{- include "cray-service.common-labels" . | nindent 4 }}
+    {{- with .Values.sqlCluster.labels -}}
+    {{ toYaml . | nindent 4 -}}
+    {{- end }}
+data:
+  pooler-schema.sql: |-
+    SELECT current_database();
+    CREATE SCHEMA IF NOT EXISTS pooler;
+    CREATE OR REPLACE FUNCTION pooler.user_lookup(in i_username text, out uname text, out phash text) RETURNS record AS $$
+    BEGIN
+      SELECT usename, passwd FROM pg_catalog.pg_shadow
+      WHERE usename = i_username INTO uname, phash;
+      RETURN;
+    END;
+    $$ LANGUAGE plpgsql SECURITY DEFINER;
+
+    REVOKE ALL ON FUNCTION pooler.user_lookup(text)
+      FROM public, pooler;
+    GRANT EXECUTE ON FUNCTION pooler.user_lookup(text)
+      TO pooler;
+    GRANT USAGE ON SCHEMA pooler TO pooler;
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: "{{ include "cray-service.fullname" . }}-create-pooler-schema-{{ .Release.Revision }}"
+  labels:
+    app.kubernetes.io/name: {{ include "cray-service.fullname" . }}-create-pooler-schema
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      volumes:
+        - name: sqlscripts
+          configMap:
+            name: {{ include "cray-service.fullname" $root }}-postgres-sqlscripts
+      containers:
+        {{- range .Values.sqlCluster.databases | keys }}
+        {{- $database := . }}
+        {{- $user := index $root.Values.sqlCluster.databases $database }}
+        - name: "postgres-create-pooler-schema-{{ $database | replace "_" "-" }}"
+          image: "{{ include "cray-service.image-prefix" $root.Values }}cache/postgres:13.2"
+          command: ["sh", "-c", "until psql postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@$POSTGRES_HOST:$POSTGRES_PORT/$POSTGRES_DB -c 'select version();'; do echo waiting for postgres db $POSTGRES_DB; sleep 2; done; sleep 60;psql postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@$POSTGRES_HOST:$POSTGRES_PORT/$POSTGRES_DB -f /scripts/pooler-schema.sql"]
+          env:
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: postgres.{{ include "cray-service.fullname" $root }}-postgres.credentials
+                  key: username
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres.{{ include "cray-service.fullname" $root }}-postgres.credentials
+                  key: password
+            - name: POSTGRES_HOST
+              value: "{{ include "cray-service.fullname" $root }}-postgres"
+            - name: POSTGRES_PORT
+              value: "5432"
+            - name: POSTGRES_DB
+              value: "{{ $database }}"
+          resources:
+            requests:
+              cpu: 100m
+              memory: "10Mi"
+            limits:
+              cpu: 500m
+              memory: "1Gi"
+          volumeMounts:
+            - name: sqlscripts
+              mountPath: /scripts
+              readOnly: true
+        {{- end }}
+{{- end }}
 {{- end }}
