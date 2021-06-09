@@ -40,14 +40,14 @@ If release name contains chart name it will be used as a full name.
 Create base chart name and version as used by the chart label.
 */}}
 {{- define "cray-service.base-chart" -}}
-{{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" -}}
+{{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" | trimSuffix "_" | trimSuffix "." -}}
 {{- end -}}
 
 {{/*
 Create actual chart name and version as used by the chart label.
 */}}
 {{- define "cray-service.chart" -}}
-{{- printf "%s-%s" (.Values.global.chart.name | default "unknown-chart-name") (.Values.global.chart.version | default "unknown-chart-version") | replace "+" "_" | trunc 63 | trimSuffix "-" -}}
+{{- printf "%s-%s" (.Values.global.chart.name | default "unknown-chart-name") (.Values.global.chart.version | default "unknown-chart-version") | replace "+" "_" | trunc 63 | trimSuffix "-" | trimSuffix "_" | trimSuffix "." -}}
 {{- end -}}
 
 {{/*
