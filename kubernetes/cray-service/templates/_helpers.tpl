@@ -82,3 +82,21 @@ Get an image prefix
 {{- printf "" -}}
 {{- end -}}
 {{- end -}}
+
+{{/*
+Create a default fully qualified name for postgresql DB Backup based on fullname.
+*/}}
+{{- define "cray-service.postgresqlDbBackupFullname" -}}
+{{- printf "%s-postgresql-db-backup" (include "cray-service.fullname" .) -}}
+{{- end -}}
+
+{{/*
+Create the name of the service account to use for the postgres DB Backup
+*/}}
+{{- define "cray-service.postgresqlDbBackupServiceAccountName" -}}
+{{- if .Values.sqlCluster.backup.serviceAccount.create -}}
+    {{ default (include "cray-service.postgresqlDbBackupFullname" .) .Values.sqlCluster.backup.serviceAccount.name }}
+{{- else -}}
+    {{ default "default" .Values.sqlCluster.backup.serviceAccount.name }}
+{{- end -}}
+{{- end -}}

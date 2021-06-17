@@ -1,0 +1,84 @@
+---
+suite: deployment test for sql backup enabled
+templates:
+  - postgresql-backup.yaml
+tests:
+  - it: should render serviceAccount, role, roleBinding, cronjob
+    set:
+      sqlCluster.enabled: true
+      sqlCluster.backup.enabled: true
+    asserts:
+      - template: postgresql-backup.yaml
+        hasDocuments:
+          count: 4
+  - it: should render the CromJob(s) with the appropriate values
+    set:
+      sqlCluster.enabled: true
+      sqlCluster.backup.enabled: true
+      chart.name: "test-chart"
+    asserts:
+      - template: postgresql-backup.yaml
+        documentIndex: 3
+        equal:
+          path: spec.schedule
+          value: "1 1 * * *"
+      - template: postgresql-backup.yaml
+        documentIndex: 3
+        equal:
+          path: spec.jobTemplate.spec.template.spec.serviceAccountName
+          value: "RELEASE-NAME-cray-service-postgresql-db-backup"
+      - template: postgresql-backup.yaml
+        documentIndex: 3
+        equal:
+          path: spec.jobTemplate.spec.template.spec.containers[0].env[0].value
+          value: "RELEASE-NAME-cray-service-postgres"
+      - template: postgresql-backup.yaml
+        documentIndex: 3
+        equal:
+          path: spec.jobTemplate.spec.template.spec.containers[0].env[1].value
+          value: '["service_account"]'
+      - template: postgresql-backup.yaml
+        documentIndex: 3
+        equal:
+          path: spec.jobTemplate.spec.template.spec.containers[0].env[3].value
+          value: "RELEASE-NAME-cray-service-postgres"
+      - template: postgresql-backup.yaml
+        documentIndex: 3
+        equal:
+          path: spec.jobTemplate.spec.template.spec.containers[0].env[5].value
+          value: "service_db"
+      - template: postgresql-backup.yaml
+        documentIndex: 3
+        equal:
+          path: spec.jobTemplate.spec.template.spec.containers[0].env[6].valueFrom.secretKeyRef.name
+          value: "postgres.RELEASE-NAME-cray-service-postgres.credentials"
+      - template: postgresql-backup.yaml
+        documentIndex: 3
+        equal:
+          path: spec.jobTemplate.spec.template.spec.containers[0].env[7].valueFrom.secretKeyRef.name
+          value: "postgres.RELEASE-NAME-cray-service-postgres.credentials"
+      - template: postgresql-backup.yaml
+        documentIndex: 3
+        equal:
+          path: spec.jobTemplate.spec.template.spec.containers[0].env[8].valueFrom.secretKeyRef.name
+          value: "postgres-backup-s3-credentials"
+      - template: postgresql-backup.yaml
+        documentIndex: 3
+        equal:
+          path: spec.jobTemplate.spec.template.spec.containers[0].env[9].valueFrom.secretKeyRef.name
+          value: "postgres-backup-s3-credentials"
+      - template: postgresql-backup.yaml
+        documentIndex: 3
+        equal:
+          path: spec.jobTemplate.spec.template.spec.containers[0].env[10].valueFrom.secretKeyRef.name
+          value: "postgres-backup-s3-credentials"
+      - template: postgresql-backup.yaml
+        documentIndex: 3
+        equal:
+          path: spec.jobTemplate.spec.template.spec.containers[0].env[11].valueFrom.secretKeyRef.name
+          value: "postgres-backup-s3-credentials"
+      - template: postgresql-backup.yaml
+        documentIndex: 3
+        equal:
+          path: spec.jobTemplate.spec.template.spec.containers[0].env[12].value
+          value: "postgres-backup"
