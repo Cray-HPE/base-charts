@@ -218,7 +218,7 @@ sqlCluster:
   backup:
     enabled: false
     image:
-      repository: "dtr.dev.cray.com/cray/postgres-db-backup"
+      repository: "dtr.dev.cray.com/cray/cray-postgres-db-backup"
       pullPolicy: IfNotPresent
       tag: "0.1.0"
 
