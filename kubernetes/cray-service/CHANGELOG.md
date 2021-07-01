@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [2.7.0]
+### Added
+- New options are added to enable an automatic backup of the PostgreSQL database. Users must opt-in.
+
 ## [2.4.5]
 ### Changed
 - The cache/postgres image was updated to pick up fixes for security vulnerabilities
