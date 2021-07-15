@@ -44,6 +44,9 @@ spec:
   volume:
     size: {{ .Values.sqlCluster.volumeSize }}
   numberOfInstances: {{ .Values.sqlCluster.instanceCount }}
+{{- if .Values.sqlCluster.podPriorityClassName }}
+  podPriorityClassName: {{ .Values.sqlCluster.podPriorityClassName }}
+{{- end }}
   {{- if .Values.sqlCluster.resources }}
   {{- with .Values.sqlCluster.resources }}
   resources:
