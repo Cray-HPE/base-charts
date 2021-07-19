@@ -13,6 +13,10 @@ nameOverride: "" # the name of your service
 fullnameOverride: "" # use this if you want to provide a more-complete name for certain labels/naming (very optional)
 replicaCount: 1
 partitionId: ""
+#
+# Use the following setting to add pod priority to your Deployment|StatefulSet|DaemonSet
+#
+# priorityClassName: csm-high-priority-service
 # custom pod hostname
 hostname: ""
 # the below are labels/annotations to generically apply to metadata on resources.
@@ -183,6 +187,10 @@ sqlCluster:
   instanceCount: 3
   postgresVersion: "11"
   volumeSize: 1Gi
+  #
+  # Consumers of this chart can set pod priority for postgres pods as follows:
+  #
+  # podPriorityClassName: csm-high-priority-service
   users:
     service_account: []
   databases:
