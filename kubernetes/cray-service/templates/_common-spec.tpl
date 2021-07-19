@@ -11,6 +11,9 @@ serviceAccountName: "{{ .Values.serviceAccountName }}"
 {{- else if or (.Values.sqlCluster.enabled) (.Values.etcdCluster.enabled) }}
 serviceAccountName: "jobs-watcher"
 {{- end }}
+{{- if .Values.priorityClassName }}
+priorityClassName: {{ .Values.priorityClassName }}
+{{- end }}
 {{- $initContainersLength := len .Values.initContainers -}}
 {{- if or (gt $initContainersLength 0) (or .Values.sqlCluster.enabled (or .Values.etcdCluster.enabled .Values.kafkaCluster.enabled)) }}
 initContainers:

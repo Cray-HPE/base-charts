@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [2.8.0]
+### Added
+- New options added to support pod priorities for postgres clusters, deployments, statefulsets and daemonsets.
+
 ## [2.7.0]
 ### Added
 - New options are added to enable an automatic backup of the PostgreSQL database. Users must opt-in.
