@@ -163,7 +163,9 @@ ingress:
   ui: false # TODO: we're not actually doing anything with this yet, but should be applicable for istio auth decisions
   # ingress.gateway
   # This should never really be changed unless you know what you're doing.
-  gateway: "services-gateway"
+  gateways:
+    - "services-gateway"
+    - "customer-admin-gateway"
   # ingress.prefix
   # This is the route to your service through the gateway from the outside. It defaults to /apis/{service name minus any `cray-`}
   # Example: `cray-ims` would default to `/apis/ims` if prefix == ""
