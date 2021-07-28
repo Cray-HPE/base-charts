@@ -21,8 +21,10 @@ metadata:
 spec:
   hosts:
     - "*"
+  {{- with .Values.ingress.gateways }}
   gateways:
-    - {{ .Values.ingress.gateway }}
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
   http:
     - match:
         - uri:

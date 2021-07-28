@@ -40,3 +40,31 @@ tests:
       - matchRegex:
           path: spec.http[0].match[0].uri.regex
           pattern: ^/.*\/?$
+  - it: should render the default gateways
+    set:
+      ingress.enabled: true
+    asserts:
+      - template: ingress.yaml
+        equal:
+          path: spec.gateways[0]
+          value: services-gateway
+      - template: ingress.yaml
+        equal:
+          path: spec.gateways[1]
+          value: customer-admin-gateway
+  - it: should render the overridden gateways
+    set:
+      ingress.enabled: true
+      ingress.gateways:
+          - testgateway1
+          - testgateway2
+    asserts:
+      - template: ingress.yaml
+        equal:
+          path: spec.gateways[0]
+          value: testgateway1
+      - template: ingress.yaml
+        equal:
+          path: spec.gateways[1]
+          value: testgateway2
+
