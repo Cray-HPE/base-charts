@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [3.0.0]
+### Changed
+- Updated to support multiple istio-ingress gateways.
+
 ## [2.8.0]
 ### Added
 - New options added to support pod priorities for postgres clusters, deployments, statefulsets and daemonsets.
