@@ -2,6 +2,8 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+
+## [4.0.0]
 ### Changed
 - The default container securityContext now sets runAsUser, runAsGroup, and runAsNonRoot.
 
