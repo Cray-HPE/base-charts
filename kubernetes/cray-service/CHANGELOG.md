@@ -3,6 +3,9 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [5.0.0]
+There were no changes from 2.8.2 and also this is the same as 2.8.0.
+
 ## [2.8.2]
 ### Changed
 - Reverted the change to the default securityContext.
