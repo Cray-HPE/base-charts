@@ -11,7 +11,7 @@ In your Helm chart, just add it to the `requirements.yaml` like:
 dependencies:
   - name: cray-jobs
     version: "~0.1.0-0"
-    repository: "@cray-internal"
+    repository: "https://artifactory.algol60.net/artifactory/csm-helm-charts"
 ```
 
 You can then add the relevant part to your chart's `values.yaml`, something like:
