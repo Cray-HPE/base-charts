@@ -75,6 +75,10 @@ OTHER DEALINGS IN THE SOFTWARE.
   readinessProbe:
     {{- toYaml .Container.readinessProbe | nindent 4 -}}
   {{- end -}}
+  {{- if .Container.startupProbe }}
+  startupProbe:
+    {{- toYaml .Container.startupProbe | nindent 4 -}}
+  {{- end -}}
   {{- if or (or .Container.volumeMounts (or .Root.Values.sqlCluster.enabled .Root.Values.kafkaCluster.enabled)) .Root.Values.mountSealedSecrets }}
   volumeMounts:
     {{- if .Root.Values.mountSealedSecrets -}}

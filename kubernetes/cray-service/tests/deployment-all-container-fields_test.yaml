@@ -142,6 +142,12 @@ tests:
               port: 8100
             initialDelaySeconds: 12
             periodSeconds: 13
+          startupProbe:
+            httpGet:
+              path: /path-startup
+              port: 8200
+            failureThreshold: 30
+            periodSeconds: 10
     asserts:
       - template: deployment.yaml
         equal:
@@ -175,6 +181,22 @@ tests:
         equal:
           path: spec.template.spec.containers[0].readinessProbe.periodSeconds
           value: 13
+      - template: deployment.yaml
+        equal:
+          path: spec.template.spec.containers[0].startupProbe.httpGet.path
+          value: /path-startup
+      - template: deployment.yaml
+        equal:
+          path: spec.template.spec.containers[0].startupProbe.httpGet.port
+          value: 8200
+      - template: deployment.yaml
+        equal:
+          path: spec.template.spec.containers[0].startupProbe.failureThreshold
+          value: 30
+      - template: deployment.yaml
+        equal:
+          path: spec.template.spec.containers[0].startupProbe.periodSeconds
+          value: 10
   - it: should render the correct volume mounts
     set:
       containers:
