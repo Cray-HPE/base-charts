@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [2.4.9]
+### Changed
+- Added the ability to have a startupProbe configured for a container
+
 ## [2.4.5]
 ### Changed
 - The cache/postgres image was updated to pick up fixes for security vulnerabilities
