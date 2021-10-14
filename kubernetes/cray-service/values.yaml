@@ -103,6 +103,12 @@ containers: {}
 #       port: 8080
 #     initialDelaySeconds: 5
 #     periodSeconds: 3
+#   startupProbe:
+#     httpGet:
+#       path: /
+#       port: 8080
+#     failureThreshold: 5
+#     periodSeconds: 3
 #   ... other standard k8s container properties supported: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.17/#container-v1-core
 
 # standard Kubernetes volumes definitions per object
