@@ -3,7 +3,7 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
-## [2.4.8]
+## [2.4.9]
 ### Changed
 - Added the ability to have a startupProbe configured for a container
 
