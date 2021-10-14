@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [6.1.0]
+### Changed
+- Added the option to set a startupProbe when configuring a container
+
 ## [6.0.0]
 ### Changed
 - The wait-for-postgres container is configured to run as the nobody user.
