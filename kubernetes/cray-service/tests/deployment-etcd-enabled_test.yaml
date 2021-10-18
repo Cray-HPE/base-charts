@@ -379,3 +379,20 @@ tests:
         equal:
           path: spec.issuerRef.name
           value: cert-manager-issuer-common
+  - it: should include priorityClassName when specified
+    set:
+      etcdCluster.podPriorityClassName: csm-high-priority-service
+      etcdCluster.enabled: true
+    asserts:
+      - template: etcd-cluster.yaml
+        documentIndex: 0
+        isNotNull:
+          path: spec.pod.priorityClassName
+  - it: should not include priorityClassName when not specified (default)
+    set:
+      etcdCluster.enabled: true
+    asserts:
+      - template: etcd-cluster.yaml
+        documentIndex: 0
+        isNull:
+          path: spec.pod.priorityClassName

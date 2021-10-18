@@ -31,6 +31,9 @@ spec:
   repository: "{{ include "cray-service.image-prefix" .Values }}coreos/etcd"
   pod:
     busyboxImage: "{{ include "cray-service.image-prefix" .Values }}library/busybox:1.28.0-glibc"
+{{- if .Values.etcdCluster.podPriorityClassName }}
+    priorityClassName: {{ .Values.etcdCluster.podPriorityClassName }}
+{{- end }}
     annotations:
       sidecar.istio.io/inject: "false"
     {{- with .Values.etcdCluster.nodeSelector }}
