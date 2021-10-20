@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [6.2.0]
+### Changed
+- Added the option (podPriorityClassName) to set pod priority for etcd cluster pods
+
 ## [6.1.0]
 ### Changed
 - Added the option to set a startupProbe when configuring a container

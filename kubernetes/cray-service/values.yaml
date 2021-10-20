@@ -182,6 +182,10 @@ etcdCluster:
   tls:
     enabled: false
     issuer: cert-manager-issuer-common
+  #
+  # Consumers of this chart can set pod priority for etcd pods as follows:
+  #
+  # podPriorityClassName: csm-high-priority-service
 
 # A list of sealedSecrets passed in to be deployed.
 sealedSecrets: []
