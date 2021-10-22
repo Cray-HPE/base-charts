@@ -100,3 +100,10 @@ Create the name of the service account to use for the postgres DB Backup
     {{ default "default" .Values.sqlCluster.backup.serviceAccount.name }}
 {{- end -}}
 {{- end -}}
+
+{{/*
+Create image names and version as used by the chart
+*/}}
+{{- define "kubectl.image" -}}
+{{- printf "%s:%s" .kubectl.image | trunc 63 | trimSuffix ":" -}}
+{{- end -}}

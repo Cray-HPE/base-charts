@@ -3,7 +3,7 @@ An InitContainer spec that waits for job completion
 */}}
 {{- define "cray-service.common-wait-for-job-container" }}
 - name: "{{.JobName }}"
-  image: "{{ include "cray-service.image-prefix" .Root.Values }}loftsman/docker-kubectl:0.2.0"
+  image: "{{ include "kubectl.image" .Root.Values }}"
   command: 
     - /bin/sh
     - -c

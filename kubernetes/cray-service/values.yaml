@@ -21,7 +21,9 @@
 # ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 # OTHER DEALINGS IN THE SOFTWARE.
 
-imagesHost: "dtr.dev.cray.com" # this value will always be set on helm install based on install context, this is a reasonable default
+kubectl:
+  image: artifactory.algol60.net/csm-docker/stable/docker-kubectl:1.19.9
+
 imagePullSecrets: []
 storageClass: "" # intended to be set/overriden at install time, or not set at all to use the default
 
@@ -239,7 +241,7 @@ sqlCluster:
     enabled: false
     instanceCount: 3
     mode: "session"
-    image: "dtr.dev.cray.com/acid/pgbouncer:master-17"
+    image: "artifactory.algol60.net/csm-docker/stable/registry.opensource.zalan.do/acid/pgbouncer:master-17"
   #
   # Consumers of this chart can override postgres cluster pod resource limits as follows:
   #
@@ -263,7 +265,7 @@ sqlCluster:
   backup:
     enabled: false
     image:
-      repository: "dtr.dev.cray.com/cray/cray-postgres-db-backup"
+      repository: "artifactory.algol60.net/csm-docker/stable/postgres-db-backup"
       pullPolicy: IfNotPresent
       tag: "0.1.0"
 

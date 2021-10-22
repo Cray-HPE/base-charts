@@ -275,7 +275,6 @@ tests:
     set:
       sqlCluster.enabled: true
       chart.name: "test-chart"
-      imagesHost: "my-repo"
       containers:
         test-service:
           name: test-service
@@ -289,7 +288,7 @@ tests:
       - template: deployment.yaml
         equal:
           path: spec.template.spec.initContainers[0].image
-          value: "my-repo/loftsman/docker-kubectl:0.2.0"
+          value: "artifactory.algol60.net/csm-docker/stable/docker-kubectl:1.19.9"
       - template: deployment.yaml
         equal:
           path: spec.template.spec.serviceAccountName
@@ -373,4 +372,4 @@ tests:
           value: session
         equal:
           path: spec.connectionPooler.dockerImage
-          value: "dtr.dev.cray.com/acid/pgbouncer:master-17"
+          value: "artifactory.algol60.net/csm-docker/stable/registry.opensource.zalan.do/acid/pgbouncer:master-17"
