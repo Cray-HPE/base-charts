@@ -11,7 +11,7 @@ jobs:
   lint-test-scan:
     uses: Cray-HPE/.github/.github/workflows/charts-lint-test-scan.yml@main
     with:
-      chart-dirs: kubernetes
       lint-and-test: ${{ github.event_name == 'pull_request' }}
+      ct-flags: --chart-dirs kubernetes --target-branch $GITHUB_BASE_REF
     secrets:
       snyk-token: ${{ secrets.SNYK_TOKEN }}
