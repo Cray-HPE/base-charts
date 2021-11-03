@@ -2,7 +2,7 @@
 ---
 apiVersion: "etcd.database.coreos.com/v1beta2"
 kind: "EtcdCluster"
-version: "{{ .Values.etcdCluster.version }}"
+version: {{ trimPrefix "v" .Values.etcdCluster.image.tag }}
 metadata:
   name: "{{ include "cray-service.name" . }}-etcd"
   labels:
@@ -27,10 +27,10 @@ spec:
         serverSecret: "{{ include "cray-service.fullname" . }}-etcd-server-tls"
       operatorSecret: "{{ include "cray-service.fullname" . }}-etcd-client-tls"
   {{- end }}
-  version: {{ .Values.etcdCluster.version }}
-  repository: "{{ include "cray-service.image-prefix" .Values }}coreos/etcd"
+  version: {{ trimPrefix "v" .Values.etcdCluster.image.tag }}
+  repository: {{ .Values.etcdCluster.image.repository }}:{{ .Values.etcdCluster.image.tag }}
   pod:
-    busyboxImage: "{{ include "cray-service.image-prefix" .Values }}library/busybox:1.28.0-glibc"
+    busyboxImage: {{ .Values.busybox.image.repository }}:{{ .Values.busybox.image.tag }}
 {{- if .Values.etcdCluster.podPriorityClassName }}
     priorityClassName: {{ .Values.etcdCluster.podPriorityClassName }}
 {{- end }}
@@ -142,7 +142,8 @@ spec:
       restartPolicy: Never
       containers:
         - name: "etcd-watcher"
-          image: "{{ include "cray-service.image-prefix" .Values }}coreos/etcd:v3.3.22"
+          image: {{ .Values.etcdCluster.image.repository }}:{{ .Values.etcdCluster.image.tag }}
+          imagePullPolicy: {{ .Values.etcdCluster.image.pullPolicy }}
           command:
           - /bin/sh
           - -c

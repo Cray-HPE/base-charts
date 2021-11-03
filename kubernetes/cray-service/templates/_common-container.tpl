@@ -23,7 +23,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 */}}
 {{- define "cray-service.common-container" }}
 - name: {{ .Container.name }}
-  image: "{{ include "cray-service.image-prefix" .Root.Values }}{{ .Container.image.repository }}:{{ .Container.image.tag | default (include "cray-service.app-version" .Root ) }}"
+  image: {{ .Container.image.repository }}:{{ .Container.image.tag | default (include "cray-service.app-version" .Root ) }}
   imagePullPolicy: {{ .Container.image.pullPolicy | default "IfNotPresent" }}
   {{- if or (.Root.Values.etcdCluster.enabled) (.Root.Values.sqlCluster.enabled) (.Root.Values.kafkaCluster.enabled) (.Container.env) }}
   env:

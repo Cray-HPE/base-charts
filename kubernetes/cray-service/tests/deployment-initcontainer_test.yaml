@@ -5,7 +5,6 @@ templates:
 tests:
   - it: should render the correct image values
     set:
-      imagesHost: "hub"
       initContainers:
         test-service:
           name: test-service
@@ -17,7 +16,7 @@ tests:
       - template: deployment.yaml
         equal:
           path: spec.template.spec.initContainers[0].image
-          value: "hub/test-service:0.0.1"
+          value: "test-service:0.0.1"
       - template: deployment.yaml
         equal:
           path: spec.template.spec.initContainers[0].imagePullPolicy

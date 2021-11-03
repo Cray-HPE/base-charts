@@ -21,7 +21,18 @@
 # ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 # OTHER DEALINGS IN THE SOFTWARE.
 
-imagesHost: "dtr.dev.cray.com" # this value will always be set on helm install based on install context, this is a reasonable default
+busybox:
+  image:
+    repository: artifactory.algol60.net/csm-docker/stable/docker.io/library/busybox
+    tag: 1.28.0-glibc
+    pullPolicy: Always
+
+kubectl:
+  image:
+    repository: artifactory.algol60.net/csm-docker/stable/docker-kubectl
+    tag: 1.19.9
+    pullPolicy: Always
+
 imagePullSecrets: []
 storageClass: "" # intended to be set/overriden at install time, or not set at all to use the default
 
@@ -144,6 +155,10 @@ service:
 
 etcdCluster:
   enabled: false
+  image:
+    repository: artifactory.algol60.net/csm-docker/stable/quay.io/coreos/etcd
+    tag: v3.3.22
+    pullPolicy: Always
   # compactionMode options: ‘periodic’, ‘revision’.
   compactionMode: periodic
   # ‘periodic’ for duration based retention, defaulting to hours if no time unit is provided (e.g. ‘5m’).
@@ -159,7 +174,6 @@ etcdCluster:
   enforceAntiAffinity: true # NOTE: If affinity is specified, this is ignored (to support backward compatibility)
   maxQuota: false # Default quota is 2GB -- setting to true sets quota to max (10GB)
   size: 3
-  version: "3.3.22"  #  NOTE: If you change this, ensure the version you are changing to is in the blob
   labels: {}
   annotations: {}
   nodeSelector: {}
@@ -218,11 +232,16 @@ ingress:
   labels: {}
   annotations: {}
 
+
 sqlCluster:
   enabled: false
+  image:
+    repository: artifactory.algol60.net/csm-docker/stable/docker.io/library/postgres
+    tag: 13.2-alpine
+    pullPolicy: Always
+  postgresVersion: "11"
   waitForItJob: true
   instanceCount: 3
-  postgresVersion: "11"
   volumeSize: 1Gi
   #
   # Consumers of this chart can set pod priority for postgres pods as follows:
@@ -239,7 +258,7 @@ sqlCluster:
     enabled: false
     instanceCount: 3
     mode: "session"
-    image: "dtr.dev.cray.com/acid/pgbouncer:master-17"
+    image: artifactory.algol60.net/csm-docker/stable/registry.opensource.zalan.do/acid/pgbouncer:master-17
   #
   # Consumers of this chart can override postgres cluster pod resource limits as follows:
   #
@@ -263,9 +282,9 @@ sqlCluster:
   backup:
     enabled: false
     image:
-      repository: "dtr.dev.cray.com/cray/cray-postgres-db-backup"
+      repository: artifactory.algol60.net/csm-docker/stable/cray-postgres-db-backup
+      tag: 0.1.0
       pullPolicy: IfNotPresent
-      tag: "0.1.0"
 
     storageBucket: postgres-backup
     storageSecret: postgres-backup-s3-credentials

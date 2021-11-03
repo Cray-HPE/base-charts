@@ -73,17 +73,6 @@ Convenient way to refer to the boot-services shared IP inside or outside a parti
 {{- end -}}
 
 {{/*
-Get an image prefix
-*/}}
-{{- define "cray-service.image-prefix" -}}
-{{- if .imagesHost -}}
-{{- printf "%s/" .imagesHost -}}
-{{- else -}}
-{{- printf "" -}}
-{{- end -}}
-{{- end -}}
-
-{{/*
 Create a default fully qualified name for postgresql DB Backup based on fullname.
 */}}
 {{- define "cray-service.postgresqlDbBackupFullname" -}}
