@@ -30,7 +30,7 @@ busybox:
 kubectl:
   image:
     repository: artifactory.algol60.net/csm-docker/stable/docker-kubectl
-    tag: 1.19.9
+    tag: 1.19.15
     pullPolicy: Always
 
 imagePullSecrets: []
