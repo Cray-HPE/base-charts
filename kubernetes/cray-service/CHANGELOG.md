@@ -3,7 +3,7 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
-## [6.3.0]
+## [7.0.0]
 ### Changed
 - Updated chart to apiVersion v2 and refactored image references to remove dtr.dev.cray.com
 
