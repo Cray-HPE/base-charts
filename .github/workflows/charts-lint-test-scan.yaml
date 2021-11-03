@@ -14,4 +14,4 @@ jobs:
       chart-dirs: kubernetes
       lint-and-test: ${{ github.event_name == 'pull_request' }}
     secrets:
-      snyk-token: ${{ secrets.SNYK_TOKEN }
+      snyk-token: ${{ secrets.SNYK_TOKEN }}
