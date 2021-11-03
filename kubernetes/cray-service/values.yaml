@@ -34,12 +34,12 @@ kubectl:
     pullPolicy: IfNotPresent
 
 imagePullSecrets: []
-storageClass: "" # intended to be set/overriden at install time, or not set at all to use the default
+storageClass: ""  # intended to be set/overriden at install time, or not set at all to use the default
 
 # TODO: finish full support for StatefulSet and DaemonSet
-type: Deployment # Deployment|StatefulSet|DaemonSet
-nameOverride: "" # the name of your service
-fullnameOverride: "" # use this if you want to provide a more-complete name for certain labels/naming (very optional)
+type: Deployment  # Deployment|StatefulSet|DaemonSet
+nameOverride: ""  # the name of your service
+fullnameOverride: ""  # use this if you want to provide a more-complete name for certain labels/naming (very optional)
 replicaCount: 1
 partitionId: ""
 #
@@ -63,10 +63,10 @@ podAnnotations: {}
 nodeSelector: {}
 tolerations: []
 affinity: {}
-serviceAccountName: "" # if set, not empty, will set the service account to use for the deployment/statefulset, daemonset, etc.
+serviceAccountName: ""  # if set, not empty, will set the service account to use for the deployment/statefulset, daemonset, etc.
 
-nobodyUserId: 65534 # The nobody user ID on our systems.
-nobodyGroupId: 65534 # The nobody group ID on our systems.
+nobodyUserId: 65534  # The nobody user ID on our systems.
+nobodyGroupId: 65534  # The nobody group ID on our systems.
 
 # Deployment Upgrade Strategy
 # Only relevant if type: Deployment is set
@@ -124,7 +124,7 @@ containers: {}
 
 # standard Kubernetes volumes definitions per object
 volumes: {}
-# volume: # arbitrary key name
+# volume:  # arbitrary key name
 #   name: my-dir
 #   emptyDir: {}
 
@@ -140,11 +140,11 @@ volumes: {}
 service:
   enabled: true
   type: ClusterIP
-  network: node-management # node-management|hardware-management|high-speed|customer-access
+  network: node-management  # node-management|hardware-management|high-speed|customer-access
   sharedIp: false
-  # Uncomment if using LoadBalancer type and need to specify it's IP
-  #loadBalancerIP: ""
-  # standard Kubernetes service port defintions
+  # Sets external IP, requires type: LoadBalancer type
+  # loadBalancerIP: ""
+  # standard Kubernetes service port definitions
   ports:
     - port: 80
       name: http
@@ -163,16 +163,16 @@ etcdCluster:
   compactionMode: periodic
   # ‘periodic’ for duration based retention, defaulting to hours if no time unit is provided (e.g. ‘5m’).
   # ‘revision’ for revision number based retention.
-  compactionRetention: 1 # Auto compaction retention. 0 means disable auto compaction.
+  compactionRetention: 1  # Auto compaction retention. 0 means disable auto compaction.
   # if compactionMode == periodic, then compactionRetention is the time on which compaction should trigger. default (1 hour)
   # if compactionMode == revision, then compactionRetention is the number of revisions at when compaction will get trigger.
 
-  snapshotMax: 5 # Maximum number of snapshot files to retain (0 is unlimited)
-  snapshotCount: 10000 # Down from default of 100000 -- easier on memory
-  heartbeatInterval: 4200 # Time (in milliseconds) of a heartbeat interval.
-  electionTimeout: 21000 # Time (in milliseconds) for an election to timeout
-  enforceAntiAffinity: true # NOTE: If affinity is specified, this is ignored (to support backward compatibility)
-  maxQuota: false # Default quota is 2GB -- setting to true sets quota to max (10GB)
+  snapshotMax: 5  # Maximum number of snapshot files to retain (0 is unlimited)
+  snapshotCount: 10000  # Down from default of 100000 -- easier on memory
+  heartbeatInterval: 4200  # Time (in milliseconds) of a heartbeat interval.
+  electionTimeout: 21000  # Time (in milliseconds) for an election to timeout
+  enforceAntiAffinity: true  # NOTE: If affinity is specified, this is ignored (to support backward compatibility)
+  maxQuota: false  # Default quota is 2GB -- setting to true sets quota to max (10GB)
   size: 3
   labels: {}
   annotations: {}
@@ -192,7 +192,7 @@ etcdCluster:
   pvc:
     enabled: true
     accessMode: "ReadWriteOnce"
-    storage: 3Gi # A bit of headroom above 2GB quota default
+    storage: 3Gi  # A bit of headroom above 2GB quota default
   tls:
     enabled: false
     issuer: cert-manager-issuer-common
@@ -209,7 +209,7 @@ mountSealedSecrets: true
 # TODO, further work on official ingress via istio and otherwise for different scenarios
 ingress:
   enabled: false
-  ui: false # TODO: we're not actually doing anything with this yet, but should be applicable for istio auth decisions
+  ui: false  # TODO: we're not actually doing anything with this yet, but should be applicable for istio auth decisions
   # ingress.gateway
   # This should never really be changed unless you know what you're doing.
   gateways:
@@ -379,13 +379,13 @@ volumeClaimTemplate:
     requests:
       storage: 1Gi
   storageClassName:
-  accessModes: [ "ReadWriteOnce" ]
+  accessModes: ["ReadWriteOnce"]
 
 global:
-  appVersion: "" # This is set at build time.
+  appVersion: ""  # This is set at build time.
   # these are values to address shortcomings of helm in referencing .Chart.* values in sub-charts/parent charts:
   # https://github.com/helm/helm/issues/4314
   # https://github.com/helm/helm/issues/3920
   chart:
-    name: "" # set at deploy time automatically, no need to ever set explicitly
-    version: "" # set at deploy time automatically, no need to ever set explicitly
+    name: ""  # set at deploy time automatically, no need to ever set explicitly
+    version: ""  # set at deploy time automatically, no need to ever set explicitly
