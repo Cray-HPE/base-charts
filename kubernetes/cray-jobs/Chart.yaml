@@ -1,5 +1,11 @@
-apiVersion: v1
-description: This chart should never be installed directly, use it as a subchart in any chart that has related jobs it needs to run/maintain
+apiVersion: v2
 name: cray-jobs
-home: "spet/cray-charts/stable/cray-jobs"
-version: 0.2.2
+version: 1.0.0
+description: This chart should never be installed directly, use it as a subchart in any chart that has related jobs it needs to run/maintain
+home: https://github.com/Cray-HPE/base-charts
+maintainers:
+  - name: bklei
+  - name: brantk-hpe
+  - name: kburns-hpe
+annotations:
+  artifacthub.io/license: MIT

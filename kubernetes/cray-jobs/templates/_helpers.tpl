@@ -54,17 +54,6 @@ Create actual chart name and version as used by the chart label.
 {{- end -}}
 
 {{/*
-Get an image prefix
-*/}}
-{{- define "cray-jobs.image-prefix" -}}
-{{- if .Values.imagesHost -}}
-{{- printf "%s/" .Values.imagesHost -}}
-{{- else -}}
-{{- printf "" -}}
-{{- end -}}
-{{- end -}}
-
-{{/*
 Renders/sets a list of containers in the appropriate container list of a job pod template
 */}}
 {{- define "cray-jobs.render-containers" -}}
@@ -72,9 +61,9 @@ Renders/sets a list of containers in the appropriate container list of a job pod
 {{- $containers := list }}
 {{- range $containerName, $containerSpec := .Containers -}}
 {{- $newContainerSpec := merge (dict "name" $containerName) $containerSpec -}}
-{{- $newImage := print (include "cray-jobs.image-prefix" $root) (index $containerSpec "image" "repository") ":" (index $containerSpec "image" "tag" | default (include "cray-jobs.app-version" $root)) -}}
+{{- $newImage := print (index $containerSpec "image" "repository") ":" (index $containerSpec "image" "tag" | default (include "cray-jobs.app-version" $root)) -}}
 {{- $_ := set $newContainerSpec "image" $newImage -}}
-{{- $_ := set $newContainerSpec "imagePullPolicy" (index $containerSpec "image" "pullPolicy" | default "IfNotPresent") -}}
+{{- $_ := set $newContainerSpec "imagePullPolicy" (index $containerSpec "image" "pullPolicy" | default "Always") -}}
 {{- $containers = append $containers $newContainerSpec -}}
 {{- end -}}
 {{- $_ := set .JobPodTemplateSpec .Key $containers -}}

@@ -31,7 +31,7 @@ tests:
         documentIndex: 0
         equal:
           path: spec.template.spec.containers[0].image
-          value: hub/job01:latest
+          value: job01:latest
       - template: jobs.yaml
         documentIndex: 0
         equal:
@@ -61,12 +61,12 @@ tests:
         documentIndex: 1
         equal:
           path: spec.template.spec.containers[0].image
-          value: hub/job02:latest
+          value: job02:latest
       - template: jobs.yaml
         documentIndex: 1
         equal:
           path: spec.template.spec.containers[0].imagePullPolicy
-          value: IfNotPresent
+          value: Always
   - it: 02 - should render with respect to global.appVersion
     values:
       - ./values-02.yaml
@@ -75,12 +75,12 @@ tests:
         documentIndex: 0
         equal:
           path: spec.template.spec.containers[0].image
-          value: dtr.dev.cray.com/job01:0.0.1
+          value: job01:0.0.1
       - template: jobs.yaml
         documentIndex: 1
         equal:
           path: spec.template.spec.containers[0].image
-          value: dtr.dev.cray.com/job02:0.0.1
+          value: job02:0.0.1
   - it: 03 - should render initContainers and ephemeralContainers
     values:
       - ./values-03.yaml
@@ -89,12 +89,12 @@ tests:
         documentIndex: 0
         equal:
           path: spec.template.spec.initContainers[0].image
-          value: dtr.dev.cray.com/job01-init:latest
+          value: job01-init:latest
       - template: jobs.yaml
         documentIndex: 0
         equal:
           path: spec.template.spec.ephemeralContainers[0].image
-          value: dtr.dev.cray.com/job01-ephemeral:latest
+          value: job01-ephemeral:latest
       - template: jobs.yaml
         documentIndex: 0
         equal:
@@ -113,4 +113,4 @@ tests:
         documentIndex: 0
         equal:
           path: spec.template.spec.containers[0].image
-          value: dtr.dev.cray.com/job01:0.0.1
+          value: job01:0.0.1
