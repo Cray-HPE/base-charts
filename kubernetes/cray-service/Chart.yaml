@@ -18,7 +18,7 @@ annotations:
     - name: postgres
       image: artifactory.algol60.net/csm-docker/stable/docker.io/library/postgres:13.2-alpine
     - name: acid/pgbouncer
-      image: artifactory.algol60.net/csm-docker/stable/registry.opensource.zalan.do/acid/pgbouncer
+      image: artifactory.algol60.net/csm-docker/stable/registry.opensource.zalan.do/acid/pgbouncer:master-17
     - name: cray-postgres-db-backup
       image: artifactory.algol60.net/csm-docker/stable/cray-postgres-db-backup:0.1.0
   artifacthub.io/license: MIT
