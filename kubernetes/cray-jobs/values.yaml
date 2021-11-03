@@ -4,16 +4,16 @@
 # Declare variables to be passed into your templates.
 
 global:
-  appVersion: "" # This is set at build time.
+  appVersion: ""  # This is set at build time.
   # these are values to address shortcomings of helm in referencing .Chart.* values in sub-charts/parent charts:
   # https://github.com/helm/helm/issues/4314
   # https://github.com/helm/helm/issues/3920
   chart:
-    name: "" # set at deploy time automatically, no need to ever set explicitly
-    version: "" # set at deploy time automatically, no need to ever set explicitly
+    name: ""  # set at deploy time automatically, no need to ever set explicitly
+    version: ""  # set at deploy time automatically, no need to ever set explicitly
 
-nameOverride: "" # chart-wide naming prefix
-fullnameOverride: "" # use this if you want to provide a more-complete name prefix for certain labels/naming (very optional)
+nameOverride: ""  # chart-wide naming prefix
+fullnameOverride: ""  # use this if you want to provide a more-complete name prefix for certain labels/naming (very optional)
 
 # Note that this base chart already applies standard labels and annotations by
 # default, you only need to worry about adding your own if you have specific
