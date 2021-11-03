@@ -25,13 +25,13 @@ busybox:
   image:
     repository: artifactory.algol60.net/csm-docker/stable/docker.io/library/busybox
     tag: 1.28.0-glibc
-    pullPolicy: Always
+    pullPolicy: IfNotPresent
 
 kubectl:
   image:
     repository: artifactory.algol60.net/csm-docker/stable/docker-kubectl
     tag: 1.19.15
-    pullPolicy: Always
+    pullPolicy: IfNotPresent
 
 imagePullSecrets: []
 storageClass: "" # intended to be set/overriden at install time, or not set at all to use the default
@@ -158,7 +158,7 @@ etcdCluster:
   image:
     repository: artifactory.algol60.net/csm-docker/stable/quay.io/coreos/etcd
     tag: v3.3.22
-    pullPolicy: Always
+    pullPolicy: IfNotPresent
   # compactionMode options: ‘periodic’, ‘revision’.
   compactionMode: periodic
   # ‘periodic’ for duration based retention, defaulting to hours if no time unit is provided (e.g. ‘5m’).
@@ -238,7 +238,7 @@ sqlCluster:
   image:
     repository: artifactory.algol60.net/csm-docker/stable/docker.io/library/postgres
     tag: 13.2-alpine
-    pullPolicy: Always
+    pullPolicy: IfNotPresent
   postgresVersion: "11"
   waitForItJob: true
   instanceCount: 3
