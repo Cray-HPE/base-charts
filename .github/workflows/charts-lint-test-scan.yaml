@@ -11,8 +11,8 @@ jobs:
   lint-test-scan:
     uses: Cray-HPE/.github/.github/workflows/charts-lint-test-scan.yml@main
     with:
-      lint: ${{ github.event_name == 'pull_request' }}
-      test: false
+      lint-charts: ${{ github.event_name == 'pull_request' }}
+      test-charts: false
       ct-flags: --chart-dirs kubernetes --target-branch $GITHUB_BASE_REF
       ct-install-flags: --debug
     secrets:
