@@ -13,7 +13,8 @@ jobs:
     with:
       lint-charts: ${{ github.event_name == 'pull_request' }}
       test-charts: false
-      ct-flags: --chart-dirs kubernetes --target-branch $GITHUB_BASE_REF
-      ct-install-flags: --debug
+      ct-config: |
+        chart-dirs:
+        - kubernetes
     secrets:
       snyk-token: ${{ secrets.SNYK_TOKEN }}
