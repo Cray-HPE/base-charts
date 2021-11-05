@@ -329,13 +329,19 @@ tests:
         documentIndex: 1
         equal:
           path: spec.resources.limits.cpu
-          value: 2
+          value: "2"
+      - template: postgresql.yaml
+        documentIndex: 1
         equal:
           path: spec.resources.limits.memory
           value: 2Gi
+      - template: postgresql.yaml
+        documentIndex: 1
         equal:
           path: spec.resources.requests.cpu
           value: 11m
+      - template: postgresql.yaml
+        documentIndex: 1
         equal:
           path: spec.resources.requests.memory
           value: 44Mi
@@ -352,9 +358,13 @@ tests:
         equal:
           path: spec.postgresql.parameters.shared_buffers
           value: 33MB
+      - template: postgresql.yaml
+        documentIndex: 0
         equal:
           path: spec.postgresql.parameters.max_connections
-          value: 11
+          value: "11"
+      - template: postgresql.yaml
+        documentIndex: 0
         equal:
           path: spec.postgresql.parameters.log_statement
           value: foo
@@ -369,12 +379,18 @@ tests:
         equal:
           path: spec.enableConnectionPooler
           value: true
+      - template: postgresql.yaml
+        documentIndex: 0
         equal:
           path: spec.connectionPooler.numberOfInstances
           value: 3
+      - template: postgresql.yaml
+        documentIndex: 0
         equal:
           path: spec.connectionPooler.mode
           value: session
+      - template: postgresql.yaml
+        documentIndex: 0
         equal:
           path: spec.connectionPooler.dockerImage
           value: pgbouncer:master-17

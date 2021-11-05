@@ -111,6 +111,8 @@ tests:
         equal:
           path: spec.pod.etcdEnv[0].name
           value: ETCD_AUTO_COMPACTION_RETENTION
+      - template: etcd-cluster.yaml
+        documentIndex: 0
         equal:
           path: spec.pod.etcdEnv[0].value
           value: "1"
@@ -123,6 +125,8 @@ tests:
         equal:
           path: spec.pod.etcdEnv[1].name
           value: ETCD_AUTO_COMPACTION_MODE
+      - template: etcd-cluster.yaml
+        documentIndex: 0
         equal:
           path: spec.pod.etcdEnv[1].value
           value: "periodic"
@@ -135,6 +139,8 @@ tests:
         equal:
           path: spec.pod.etcdEnv[2].name
           value: ETCD_HEARTBEAT_INTERVAL
+      - template: etcd-cluster.yaml
+        documentIndex: 0
         equal:
           path: spec.pod.etcdEnv[2].value
           value: "4200"
@@ -147,6 +153,8 @@ tests:
         equal:
           path: spec.pod.etcdEnv[3].name
           value: ETCD_ELECTION_TIMEOUT
+      - template: etcd-cluster.yaml
+        documentIndex: 0
         equal:
           path: spec.pod.etcdEnv[3].value
           value: "21000"
@@ -159,6 +167,8 @@ tests:
         equal:
           path: spec.pod.etcdEnv[4].name
           value: ETCD_MAX_SNAPSHOTS
+      - template: etcd-cluster.yaml
+        documentIndex: 0
         equal:
           path: spec.pod.etcdEnv[4].value
           value: "5"
@@ -172,6 +182,8 @@ tests:
         equal:
           path: spec.pod.etcdEnv[6].name
           value: ETCD_QUOTA_BACKEND_BYTES
+      - template: etcd-cluster.yaml
+        documentIndex: 0
         equal:
           path: spec.pod.etcdEnv[6].value
           value: "10737418240"
@@ -196,6 +208,8 @@ tests:
         equal:
           path: spec.pod.etcdEnv[5].name
           value: ETCD_SNAPSHOT_COUNT
+      - template: etcd-cluster.yaml
+        documentIndex: 0
         equal:
           path: spec.pod.etcdEnv[5].value
           value: "10000"
@@ -209,6 +223,8 @@ tests:
         equal:
           path: spec.pod.etcdEnv[5].name
           value: ETCD_SNAPSHOT_COUNT
+      - template: etcd-cluster.yaml
+        documentIndex: 0
         equal:
           path: spec.pod.etcdEnv[5].value
           value: "5"
@@ -253,12 +269,18 @@ tests:
         equal:
           path: spec.pod.resources.limits.cpu
           value: 1
+      - template: etcd-cluster.yaml
+        documentIndex: 0
         equal:
           path: spec.pod.resources.limits.memory
           value: 1Gi
+      - template: etcd-cluster.yaml
+        documentIndex: 0
         equal:
           path: spec.pod.resources.requests.cpu
           value: 11m
+      - template: etcd-cluster.yaml
+        documentIndex: 0
         equal:
           path: spec.pod.resources.requests.memory
           value: 44Mi
@@ -272,9 +294,13 @@ tests:
         equal:
           path: spec.TLS.static.member.peerSecret
           value: RELEASE-NAME-cray-service-etcd-peer-tls
+      - template: etcd-cluster.yaml
+        documentIndex: 0
         equal:
           path: spec.TLS.static.member.serverSecret
           value: RELEASE-NAME-cray-service-etcd-server-tls
+      - template: etcd-cluster.yaml
+        documentIndex: 0
         equal:
           path: spec.TLS.static.operatorSecret
           value: RELEASE-NAME-cray-service-etcd-client-tls
