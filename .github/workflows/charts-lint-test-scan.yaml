@@ -13,8 +13,5 @@ jobs:
     with:
       lint-charts: ${{ github.event_name == 'pull_request' }}
       test-charts: false
-      ct-config: |
-        chart-dirs:
-        - kubernetes
     secrets:
       snyk-token: ${{ secrets.SNYK_TOKEN }}
