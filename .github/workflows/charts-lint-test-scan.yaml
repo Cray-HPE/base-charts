@@ -12,7 +12,7 @@ jobs:
     uses: Cray-HPE/.github/.github/workflows/charts-lint-test-scan.yml@main
     with:
       lint-charts: ${{ github.event_name == 'pull_request' }}
-      test-charts: false
+      test-charts: ${{ github.event_name == 'pull_request' }}
       setup-k8s: |
         curl -L https://istio.io/downloadIstio | ISTIO_VERSION=1.8.6 sh -
         cd istio-1.8.6
