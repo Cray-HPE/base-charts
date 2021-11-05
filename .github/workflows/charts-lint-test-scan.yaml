@@ -13,5 +13,10 @@ jobs:
     with:
       lint-charts: ${{ github.event_name == 'pull_request' }}
       test-charts: false
+      setup-k8s: |
+        curl -L https://istio.io/downloadIstio | ISTIO_VERSION=1.8.6 sh -
+        cd istio-1.8.6
+        export PATH=$PWD/bin:$PATH
+        istioctl install --set profile=demo -y
     secrets:
       snyk-token: ${{ secrets.SNYK_TOKEN }}
