@@ -13,11 +13,11 @@ jobs:
     with:
       lint-charts: ${{ github.event_name == 'pull_request' }}
       test-charts: ${{ github.event_name == 'pull_request' }}
-      test-setup: |
+      lint-setup: |
         # Install Helm unittest plugin
         helm env
         helm plugin install https://github.com/quintush/helm-unittest
-
+      test-setup: |
         # Install Istio
         curl -L https://istio.io/downloadIstio | ISTIO_VERSION=1.8.6 sh -
         cd istio-1.8.6
