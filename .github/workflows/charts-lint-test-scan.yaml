@@ -13,7 +13,7 @@ jobs:
     with:
       lint-charts: ${{ github.event_name == 'pull_request' }}
       test-charts: false
-      lint-setup: |
+      lint-pre-script: |
         # Install Helm unittest plugin
         helm env
         helm plugin install https://github.com/quintush/helm-unittest
