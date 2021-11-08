@@ -78,7 +78,8 @@ tests:
     set:
       kafkaCluster.enabled: true
       chart.name: "test-chart"
-      imagesHost: "my-repo"
+      busybox.image.repository: "busybox"
+      busybox.image.tag: "1.28.0-glibc"
     asserts:
       - template: deployment.yaml
         equal:
@@ -87,4 +88,4 @@ tests:
       - template: deployment.yaml
         equal:
           path: spec.template.spec.initContainers[0].image
-          value: "my-repo/library/busybox:1.28.0-glibc"
+          value: "busybox:1.28.0-glibc"

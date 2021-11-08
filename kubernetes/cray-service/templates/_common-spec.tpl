@@ -19,7 +19,8 @@ priorityClassName: {{ .Values.priorityClassName }}
 initContainers:
 {{- if .Values.kafkaCluster.enabled }}
 - name: "wait-for-kafka"
-  image: "{{ include "cray-service.image-prefix" $root.Values }}library/busybox:1.28.0-glibc"
+  image: {{ .Values.busybox.image.repository }}:{{ .Values.busybox.image.tag }}
+  imagePullPolicy: {{ .Values.busybox.image.pullPolicy }}
   command: {{/* TODO: implement a more sophisticated wait, if necessary */}}
     - /bin/sh
     - -c

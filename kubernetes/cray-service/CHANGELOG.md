@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [7.0.0]
+### Changed
+- Updated chart to apiVersion v2 and refactored image references to remove dtr.dev.cray.com
+
 ## [6.2.0]
 ### Changed
 - Added the option (podPriorityClassName) to set pod priority for etcd cluster pods
