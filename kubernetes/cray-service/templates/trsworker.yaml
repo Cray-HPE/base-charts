@@ -1,11 +1,16 @@
-{{- if .Values.trsWorker.enabled -}}
+{{- if gt (len .Values.trsWorkers) 0 -}}
+{{- $fullname := include "cray-service.fullname" . -}} 
+{{- range .Values.trsWorkers }}
+---
 apiVersion: trs.hms.cray.com/v1alpha1
 kind: TRSWorker
 metadata:
-  name: "{{ include "cray-service.fullname" . }}"
+  name: "{{ $fullname }}-{{ .workerType }}-{{ .workerVersion }}"
 spec:
-  worker_type: {{ .Values.trsWorker.workerType }}
-  worker_version: {{ .Values.trsWorker.workerVersion }}
+  worker_type: {{ .workerType | quote }}
+  worker_version: {{ .workerVersion | quote }}
+  worker_image_tag: {{ .workerImageTag | quote }}
+{{- end }}
 
 ---
 # The deployment using this TRSWorker really needs to wait for the topics to actually have been created before
@@ -27,19 +32,22 @@ spec:
       # This service account is created in the TRS operator deployment.
       serviceAccountName: "kafka-topics-watcher"
       containers:
-        - name: "wait-for-kafka-topics"
-          image: {{ .Values.kubectl.image.repository }}:{{ .Values.kubectl.image.tag }}
-          imagePullPolicy: {{ .Values.kubectl.image.pullPolicy }}
+{{- range .Values.trsWorkers }}
+{{- $trsWorkerName := print $fullname "-" .workerType "-" .workerVersion }}
+        - name: "wait-for-kafka-topics-{{ .workerType }}-{{ .workerVersion }}"
+          image: {{ $.Values.kubectl.image.repository }}:{{ $.Values.kubectl.image.tag }}
+          imagePullPolicy: {{ $.Values.kubectl.image.pullPolicy }}
           command:
             - /bin/sh
             - -c
-            - while [ "`kubectl -n services get kafkatopics.kafka.strimzi.io trs-{{ include "cray-service.fullname" . }}-{{ .Values.trsWorker.workerType }}-{{ .Values.trsWorker.workerVersion }}-rcv -o jsonpath='{.status.conditions[0].type}'`" != "Ready" ]; do
-              echo "Waiting for trs-{{ include "cray-service.fullname" . }}-{{ .Values.trsWorker.workerType }}-{{ .Values.trsWorker.workerVersion }}-rcv to be Ready";
+            - while [ "`kubectl -n services get kafkatopics.kafka.strimzi.io trs-{{ $trsWorkerName }}-{{ .workerType }}-{{ .workerVersion }}-rcv -o jsonpath='{.status.conditions[0].type}'`" != "Ready" ]; do
+              echo "Waiting for trs-{{ $trsWorkerName }}-{{ .workerType }}-{{ .workerVersion }}-rcv to be Ready";
               sleep 3;
               done;
-              while [ "`kubectl -n services get kafkatopics.kafka.strimzi.io trs-{{ include "cray-service.fullname" . }}-{{ .Values.trsWorker.workerType }}-{{ .Values.trsWorker.workerVersion }}-send -o jsonpath='{.status.conditions[0].type}'`" != "Ready" ]; do
-              echo "Waiting for trs-{{ include "cray-service.fullname" . }}-{{ .Values.trsWorker.workerType }}-{{ .Values.trsWorker.workerVersion }}-send to be Ready";
+              while [ "`kubectl -n services get kafkatopics.kafka.strimzi.io trs-{{ $trsWorkerName }}-{{ .workerType }}-{{ .workerVersion }}-send -o jsonpath='{.status.conditions[0].type}'`" != "Ready" ]; do
+              echo "Waiting for trs-{{ $trsWorkerName }}-{{ .workerType }}-{{ .workerVersion }}-send to be Ready";
               sleep 3;
               done;
               echo "Kafka topics reported ready.";
+{{- end }}
 {{- end }}
