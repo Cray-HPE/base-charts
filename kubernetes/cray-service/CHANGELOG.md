@@ -3,6 +3,11 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [8.0.0]
+### Changed
+- Added the ability to specify multiple TRSWorker resources.
+- When creating a TRSWorker resource the desired TRS Worker container image tag needs be specified to allow the TRS Operator to correctly create the TRS Worker pods with a valid container image tag.
+
 ## [7.0.0]
 ### Changed
 - Updated chart to apiVersion v2 and refactored image references to remove dtr.dev.cray.com
