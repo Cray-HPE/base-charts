@@ -1,0 +1,12 @@
+# Snyk (https://snyk.io) policy file, patches or ignores known vulnerabilities.
+version: v1.22.1
+# ignores vulnerabilities until expiry date; change duration by modifying expiry date
+ignore:
+  SNYK-ALPINE312-BUSYBOX-1089799:
+    - '*':
+        reason: >-
+          Vulnerability in base image not fixed in an available newer upstream
+          image
+        expires: 2021-12-31T00:00:00.000Z
+        created: 2021-12-02T20:07:29.627Z
+patch: {}
