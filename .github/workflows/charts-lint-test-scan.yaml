@@ -17,5 +17,8 @@ jobs:
         # Install Helm unittest plugin
         helm env
         helm plugin install https://github.com/quintush/helm-unittest
+      scan-charts: false
+      scan-images: false
+      scan-image-snyk-args: "--policy-path=.snyk"
     secrets:
       snyk-token: ${{ secrets.SNYK_TOKEN }}
