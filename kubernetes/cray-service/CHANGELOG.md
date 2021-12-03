@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [7.0.01]
+### Changed
+- cray-service renders EtcdCluster `spec.repository` values without tags
+
 ## [7.0.0]
 ### Changed
 - Updated chart to apiVersion v2 and refactored image references to remove dtr.dev.cray.com
