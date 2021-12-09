@@ -372,7 +372,7 @@ tests:
     set:
       sqlCluster.enabled: true
       sqlCluster.connectionPooler.enabled: true
-      sqlCluster.connectionPooler.image: pgbouncer:master-17
+      sqlCluster.connectionPooler.image: pgbouncer:master-19
     asserts:
       - template: postgresql.yaml
         documentIndex: 0
@@ -393,4 +393,4 @@ tests:
         documentIndex: 0
         equal:
           path: spec.connectionPooler.dockerImage
-          value: pgbouncer:master-17
+          value: pgbouncer:master-19

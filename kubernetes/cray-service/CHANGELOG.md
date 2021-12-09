@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [8.1.0]
+### Changed
+- Updated pgbouncer image version to the latest from upstream
+
 ## [8.0.0]
 ### Changed
 - Added the ability to specify multiple TRSWorker resources.

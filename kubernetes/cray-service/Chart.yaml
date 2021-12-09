@@ -1,6 +1,6 @@
 apiVersion: v2
 name: cray-service
-version: 8.0.0
+version: 8.1.0
 description: This chart should never be installed directly, base your specific Cray service charts off this one
 home: https://github.com/Cray-HPE/base-charts
 maintainers:
@@ -18,7 +18,7 @@ annotations:
     - name: postgres
       image: artifactory.algol60.net/csm-docker/stable/docker.io/library/postgres:13.2-alpine
     - name: acid/pgbouncer
-      image: artifactory.algol60.net/csm-docker/stable/registry.opensource.zalan.do/acid/pgbouncer:master-17
+      image: artifactory.algol60.net/csm-docker/stable/registry.opensource.zalan.do/acid/pgbouncer:master-19
     - name: cray-postgres-db-backup
       image: artifactory.algol60.net/csm-docker/stable/cray-postgres-db-backup:0.2.0
   artifacthub.io/license: MIT
