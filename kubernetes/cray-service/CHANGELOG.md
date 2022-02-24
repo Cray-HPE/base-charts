@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [8.1.2]
+### Changed
+- Updated pgbouncer image version to the latest (master-21) built from upstream
+
 ## [8.1.1]
 ### Changed
 - The default tag for the cray-postgres-db-backup is now 0.2.1 to pick up security fixes.
