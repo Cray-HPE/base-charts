@@ -217,7 +217,7 @@ etcdCluster:
     accessMode: "ReadWriteOnce"
     storage: 3Gi  # A bit of headroom above 2GB quota default
   tls:
-    enabled: false
+    enabled: true
     issuer: cert-manager-issuer-common
   #
   # Consumers of this chart can set pod priority for etcd pods as follows:
