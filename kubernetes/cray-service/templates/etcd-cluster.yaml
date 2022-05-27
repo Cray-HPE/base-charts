@@ -51,7 +51,7 @@ spec:
       operatorSecret: "{{ include "cray-service.fullname" . }}-etcd-client-tls"
   {{- end }}
   version: {{ trimPrefix "v" .Values.etcdCluster.image.tag }}
-  repository: {{ .Values.etcdCluster.image.repository }}:{{ .Values.etcdCluster.image.tag }}
+  repository: {{ .Values.etcdCluster.image.repository }}
   pod:
     busyboxImage: {{ .Values.busybox.image.repository }}:{{ .Values.busybox.image.tag }}
 {{- if .Values.etcdCluster.podPriorityClassName }}
