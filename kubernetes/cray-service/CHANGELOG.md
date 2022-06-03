@@ -3,6 +3,11 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [8.1.4]
+### Changed
+- Fix etcd issues with image tags and TLS
+- Enable TLS externally via cert-manager for postgresql
+
 ## [8.1.2]
 ### Changed
 - Updated pgbouncer image version to the latest (master-21) built from upstream
