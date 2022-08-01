@@ -3,6 +3,12 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [8.2.0]
+### Changed
+- Allow 127.0.0.6 access to postgres server without TLS. This provides access to
+  the Postgres server within the Istio Mesh without requiring an additional TLS
+  layer.
+
 ## [8.1.4]
 ### Changed
 - Fix etcd issues with image tags and TLS
