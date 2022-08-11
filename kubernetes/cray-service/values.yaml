@@ -82,6 +82,8 @@ labels: {}
 annotations: {}
 # pod annotations only apply to spec.template.metadata.annotations within a deployment, statefulset, daemonset, etc.
 podAnnotations: {}
+# pod labels only apply to spec.template.metadata.labels within a deployment, statefulset, daemonset, etc.
+podLabels: {}
 # standard Kubernetes nodeSelector, tolerations, and affinity objects for spec
 nodeSelector: {}
 tolerations: []

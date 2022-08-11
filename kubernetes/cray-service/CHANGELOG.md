@@ -3,6 +3,11 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [8.2.1]
+### Changed
+- Add support for adding labels to pods for deployments, daemonsets and
+  statefulsets.
+
 ## [8.2.0]
 ### Changed
 - Allow 127.0.0.6 access to postgres server without TLS. This provides access to
