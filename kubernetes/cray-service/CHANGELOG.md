@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [8.2.2]
+### Changed
+- The default tag for the cray-postgres-db-backup is now 0.2.2 to pick up security fixes.
+
 ## [8.2.1]
 ### Changed
 - Add support for adding labels to pods for deployments, daemonsets and
