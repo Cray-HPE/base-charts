@@ -3,9 +3,13 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [8.2.3]
+### Changed
+- The default tag for cray-postgres-db-backup is now 0.2.3 to fix a restore issue (CASMPET-5936).
+
 ## [8.2.2]
 ### Changed
-- The default tag for the cray-postgres-db-backup is now 0.2.2 to pick up security fixes.
+- The default tag for cray-postgres-db-backup is now 0.2.2 to pick up security fixes.
 
 ## [8.2.1]
 ### Changed
