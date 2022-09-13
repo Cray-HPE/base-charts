@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [8.1.5]
+### Changed
+- The default tag of cray-postgres-db-backup is now 0.2.3 to fix a restore issue (CASMPET-5936)
+
 ## [8.1.4]
 ### Changed
 - Fix etcd issues with image tags and TLS

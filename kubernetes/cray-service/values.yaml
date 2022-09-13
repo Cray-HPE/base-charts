@@ -306,7 +306,7 @@ sqlCluster:
     enabled: false
     image:
       repository: artifactory.algol60.net/csm-docker/stable/cray-postgres-db-backup
-      tag: 0.2.1
+      tag: 0.2.3
       pullPolicy: IfNotPresent
 
     storageBucket: postgres-backup
