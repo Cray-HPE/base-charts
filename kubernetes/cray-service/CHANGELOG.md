@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [7.0.2]
+### Changed
+- The default tag for cray-postgres-db-backup is now 0.2.3 to fix a restore issue (CASMPET-5936).
+
 ## [7.0.01]
 ### Changed
 - cray-service renders EtcdCluster `spec.repository` values without tags
