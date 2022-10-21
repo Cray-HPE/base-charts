@@ -1,0 +1,23 @@
+name: Run Api Checker
+on:
+  pull_request:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+jobs:
+  k8s-api-checker:
+    runs-on: ubuntu-20.04
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Check for removed and deprecated api usage
+        uses: Cray-HPE/.github/actions/csm-k8s-api-checker@v0-csm-k8s-api-checker
+        with:
+          prerequisite: |
+            helm template kubernetes/cray-service  --generate-name --dry-run --set sqlCluster.enabled=true --set sqlCluster.backup.enabled=true > cray-service.yaml
+            helm template kubernetes/cray-jobs  --generate-name --dry-run > cray-jobs.yaml
+            sed -i -e 's/release-name-//g' cray-service.yaml cray-jobs.yaml
