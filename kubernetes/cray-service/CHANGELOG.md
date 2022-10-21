@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [8.3.1]
+### Changed
+- Updated hopefully last usage of rbac.authorization.k8s.io/v1beta1 api
+
 ## [8.3.0]
 ### Changed
 - Updated all api usage to no longer use removed Kubernetes apis.
