@@ -178,54 +178,16 @@ service:
   labels: {}
   annotations: {}
 
-etcdCluster:
-  enabled: false
-  image:
-    repository: artifactory.algol60.net/csm-docker/stable/quay.io/coreos/etcd
-    tag: v3.3.22
-    pullPolicy: IfNotPresent
-  # compactionMode options: ‘periodic’, ‘revision’.
-  compactionMode: periodic
-  # ‘periodic’ for duration based retention, defaulting to hours if no time unit is provided (e.g. ‘5m’).
-  # ‘revision’ for revision number based retention.
-  compactionRetention: 1  # Auto compaction retention. 0 means disable auto compaction.
-  # if compactionMode == periodic, then compactionRetention is the time on which compaction should trigger. default (1 hour)
-  # if compactionMode == revision, then compactionRetention is the number of revisions at when compaction will get trigger.
-
-  snapshotMax: 5  # Maximum number of snapshot files to retain (0 is unlimited)
-  snapshotCount: 10000  # Down from default of 100000 -- easier on memory
-  heartbeatInterval: 4200  # Time (in milliseconds) of a heartbeat interval.
-  electionTimeout: 21000  # Time (in milliseconds) for an election to timeout
-  enforceAntiAffinity: true  # NOTE: If affinity is specified, this is ignored (to support backward compatibility)
-  maxQuota: false  # Default quota is 2GB -- setting to true sets quota to max (10GB)
-  size: 3
-  labels: {}
-  annotations: {}
-  nodeSelector: {}
-  affinity: {}
-  #
-  # Consumers of this chart can override etcd cluster pod resource limits as follows:
-  #
-  # resources:
-  #   limits:
-  #     cpu: "2"
-  #     memory: 2Gi
-  #   requests:
-  #     cpu: 10m
-  #     memory: 64Mi
-  resources: {}
-  pvc:
-    enabled: true
-    accessMode: "ReadWriteOnce"
-    storage: 3Gi  # A bit of headroom above 2GB quota default
-  tls:
-    enabled: false
-    issuer: cert-manager-issuer-common
-  #
-  # Consumers of this chart can set pod priority for etcd pods as follows:
-  #
-  # podPriorityClassName: csm-high-priority-service
-
+#
+# Set this to true if also pulling in the cray-etcd-base chart, this
+# flag edits deployments to also include containers to wait for
+# etcd to be up.
+#
+# Actual etcd cluster configured via the chart at:
+# https://github.com/Cray-HPE/cray-etcd/tree/master/charts/cray-etcd-base
+#
+etcdWaitContainer: false
+  
 # A list of sealedSecrets passed in to be deployed.
 sealedSecrets: []
 # Whether or not to mount secrets as volumeMounts to containers

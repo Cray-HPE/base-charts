@@ -28,7 +28,6 @@ templates:
   - statefulset.yaml
   - daemonset.yaml
   - service.yaml
-  - etcd-cluster.yaml
   - ingress.yaml
   - pvcs.yaml
 tests:
@@ -45,9 +44,6 @@ tests:
       - template: service.yaml
         hasDocuments:
           count: 1
-      - template: etcd-cluster.yaml
-        hasDocuments:
-          count: 0
       - template: ingress.yaml
         hasDocuments:
           count: 0

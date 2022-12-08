@@ -25,11 +25,11 @@ OTHER DEALINGS IN THE SOFTWARE.
 - name: {{ .Container.name }}
   image: {{ .Container.image.repository }}:{{ .Container.image.tag | default (include "cray-service.app-version" .Root ) }}
   imagePullPolicy: {{ .Container.image.pullPolicy | default "IfNotPresent" }}
-  {{- if or (.Root.Values.etcdCluster.enabled) (.Root.Values.sqlCluster.enabled) (.Root.Values.kafkaCluster.enabled) (.Container.env) }}
+  {{- if or (.Root.Values.etcdWaitContainer) (.Root.Values.sqlCluster.enabled) (.Root.Values.kafkaCluster.enabled) (.Container.env) }}
   env:
-    {{- if .Root.Values.etcdCluster.enabled }}
+    {{- if .Root.Values.etcdWaitContainer }}
     - name: ETCD_HOST
-      value: "{{ include "cray-service.name" .Root }}-etcd-client"
+      value: "{{ include "cray-service.name" .Root }}-etcd"
     - name: ETCD_PORT
       value: "2379"
     {{- end }}
