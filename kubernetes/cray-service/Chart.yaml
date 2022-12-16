@@ -23,7 +23,7 @@
 #
 apiVersion: v2
 name: cray-service
-version: 8.3.0
+version: 9.0.0
 description: This chart should never be installed directly, base your specific Cray service charts off this one
 home: https://github.com/Cray-HPE/base-charts
 maintainers:
@@ -35,8 +35,6 @@ annotations:
       image: artifactory.algol60.net/csm-docker/stable/docker.io/library/busybox:1.28.0-glibc
     - name: docker-kubectl
       image: artifactory.algol60.net/csm-docker/stable/docker-kubectl:1.19.15
-    - name: coreos/etcd
-      image: artifactory.algol60.net/csm-docker/stable/quay.io/coreos/etcd:v3.3.22
     - name: postgres
       image: artifactory.algol60.net/csm-docker/stable/docker.io/library/postgres:13.2-alpine
     - name: acid/pgbouncer

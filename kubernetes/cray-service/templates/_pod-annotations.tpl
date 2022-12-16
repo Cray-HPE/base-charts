@@ -8,7 +8,7 @@ service.cray.io/public: "{{ .Values.service.enabled }}"
 {{ toYaml . -}}
 {{- end -}}
 {{- else -}}
-{{ if .Values.etcdCluster.enabled -}}
+{{ if .Values.etcdWaitContainer -}}
 traffic.sidecar.istio.io/excludeOutboundPorts: 2379,2380
 {{- end -}}
 {{- end -}}

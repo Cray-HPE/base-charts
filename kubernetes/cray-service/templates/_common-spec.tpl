@@ -8,14 +8,14 @@ hostname: "{{ .Values.hostname }}"
 {{- end }}
 {{- if .Values.serviceAccountName }}
 serviceAccountName: "{{ .Values.serviceAccountName }}"
-{{- else if or (.Values.sqlCluster.enabled) (.Values.etcdCluster.enabled) }}
+{{- else if or (.Values.sqlCluster.enabled) (.Values.etcdWaitContainer) }}
 serviceAccountName: "jobs-watcher"
 {{- end }}
 {{- if .Values.priorityClassName }}
 priorityClassName: {{ .Values.priorityClassName }}
 {{- end }}
 {{- $initContainersLength := len .Values.initContainers -}}
-{{- if or (gt $initContainersLength 0) (or .Values.sqlCluster.enabled (or .Values.etcdCluster.enabled .Values.kafkaCluster.enabled)) }}
+{{- if or (gt $initContainersLength 0) (or .Values.sqlCluster.enabled (or .Values.etcdWaitContainer .Values.kafkaCluster.enabled)) }}
 initContainers:
 {{- if .Values.kafkaCluster.enabled }}
 - name: "wait-for-kafka"
@@ -30,7 +30,7 @@ initContainers:
   {{- $input := dict "JobName" (nospace (cat (include "cray-service.fullname" $root) "-wait-for-postgres")) "Root" $root }}
   {{- include "cray-service.common-wait-for-job-container" $input }}
 {{- end }}
-{{- if .Values.etcdCluster.enabled }}
+{{- if .Values.etcdWaitContainer }}
   {{- $input := dict "JobName" (nospace (cat (include "cray-service.fullname" $root) "-wait-for-etcd")) "Root" $root }}
   {{- include "cray-service.common-wait-for-job-container" $input }}
 {{- end }}
