@@ -34,10 +34,6 @@ initContainers:
   {{- $input := dict "JobName" (nospace (cat (include "cray-service.fullname" $root) "-wait-for-etcd")) "Root" $root }}
   {{- include "cray-service.common-wait-for-job-container" $input }}
 {{- end }}
-{{- if gt (len .Values.trsWorkers) 0 }}
-  {{- $input := dict "JobName" (nospace (cat (include "cray-service.fullname" $root) "-wait-for-kafka-topics")) "Root" $root }}
-  {{- include "cray-service.common-wait-for-job-container" $input }}
-{{- end }}
 {{- range $index, $initContainer := .Values.initContainers }}
   {{- $commonContainer := dict "Root" $root "Container" $initContainer }}
   {{- include "cray-service.common-container" $commonContainer }}

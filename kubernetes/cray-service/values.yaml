@@ -319,13 +319,6 @@ sqlCluster:
     affinity: {}
 
 
-trsWorkers: []
-  ## Example HTTP TRSWorker
-  ## The combintation of workerType and workerVersion need to be unique in the trsWorkers array.
-  # - workerType: "http"
-  #   workerVersion: "v1"
-  #   workerImageTag: 1.6.0
-
 kafkaCluster:
   enabled: false
   ### For examples of what can go in the following sections
