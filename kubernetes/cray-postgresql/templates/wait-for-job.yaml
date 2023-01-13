@@ -1,0 +1,76 @@
+{{/*
+MIT License
+
+(C) Copyright 2023 Hewlett Packard Enterprise Development LP
+
+Permission is hereby granted, free of charge, to any person obtaining a
+copy of this software and associated documentation files (the "Software"),
+to deal in the Software without restriction, including without limitation
+the rights to use, copy, modify, merge, publish, distribute, sublicense,
+and/or sell copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included
+in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+OTHER DEALINGS IN THE SOFTWARE.
+*/}}
+{{- if .Values.sqlCluster.enabled -}}
+{{- $root := . -}}
+{{- if .Values.sqlCluster.waitForItJob }}
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: "{{ include "cray-postgresql.fullname" . }}-wait-for-postgres-{{ .Release.Revision }}"
+  labels:
+    app.kubernetes.io/name: {{ include "cray-postgresql.fullname" . }}-wait-for-postgres
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        {{- range .Values.sqlCluster.databases | keys }}
+        {{- $database := . }}
+        {{- $user := index $root.Values.sqlCluster.databases $database }}
+        - name: postgres-watcher-{{ $database | replace "_" "-" }}
+          image: {{ $root.Values.sqlCluster.image.repository }}:{{ $root.Values.sqlCluster.image.tag }}
+          imagePullPolicy: {{ $root.Values.sqlCluster.image.pullPolicy }}
+          securityContext:
+            runAsUser: 65534
+            runAsGroup: 65534
+            runAsNonRoot: true
+          command: ["sh", "-c", "until psql postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@$POSTGRES_HOST:$POSTGRES_PORT/$POSTGRES_DB -c 'select version();'; do echo waiting for postgres db $POSTGRES_DB; sleep 2; done;  echo 'POSTGRES_READY';"]
+          env:
+          - name: POSTGRES_USER
+            valueFrom:
+              secretKeyRef:
+                name: {{ $user | replace "_" "-" }}.{{ include "cray-postgresql.fullname" $root }}-postgres.credentials
+                key: username
+          - name: POSTGRES_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: {{ $user | replace "_" "-" }}.{{ include "cray-postgresql.fullname" $root }}-postgres.credentials
+                key: password
+          - name: POSTGRES_HOST
+            value: "{{ include "cray-postgresql.fullname" $root }}-postgres"
+          - name: POSTGRES_PORT
+            value: "5432"
+          - name: POSTGRES_DB
+            value: "{{ $database }}"
+          resources:
+            requests:
+              cpu: 100m
+              memory: "10Mi"
+            limits:
+              cpu: 500m
+              memory: "1Gi"
+        {{- end }}
+{{- end }}
+{{- end }}
