@@ -46,23 +46,43 @@ CHART_NAME_1 ?= cray-service
 CHART_NAME_2 ?= cray-jobs
 CHART_VERSION_1 ?= local
 CHART_VERSION_2 ?= local
-
+COMMA := ,
+#HELM_UNITTEST_IMAGE ?= artifactory.algol60.net/csm-docker/stable/docker.io/quintush/helm-unittest
 HELM_UNITTEST_IMAGE ?= quintush/helm-unittest:3.3.0-0.2.5
+HELM_IMAGE ?= artifactory.algol60.net/csm-docker/stable/docker.io/alpine/helm:3.9.4
+
+ifeq ($(shell uname -s),Darwin)
+	HELM_CONFIG_HOME ?= $(HOME)/Library/Preferences/helm
+else
+	HELM_CONFIG_HOME ?= $(HOME)/.config/helm
+endif
+
+helm:
+	docker run --rm \
+	    --user $(shell id -u):$(shell id -g) \
+	    --mount type=bind,src="$(shell pwd)",dst=/src \
+	    $(if $(wildcard $(HELM_CONFIG_HOME)/.),--mount type=bind$(COMMA)src=$(HELM_CONFIG_HOME)$(COMMA)dst=/tmp/.helm/config) \
+	    -w /src \
+	    -e HELM_CACHE_HOME=/src/.helm/cache \
+	    -e HELM_CONFIG_HOME=/tmp/.helm/config \
+	    -e HELM_DATA_HOME=/src/.helm/data \
+	    $(HELM_IMAGE) \
+	    $(CMD)
 
 charts: chart1 chart2 chart1_test chart2_test
 
 chart1:
-	helm dep up ${CHART_PATH}/${CHART_NAME_1}
-	helm package ${CHART_PATH}/${CHART_NAME_1} -d ${CHART_PATH}/.packaged --version ${CHART_VERSION_1}
+	CMD="dep up ${CHART_PATH}/${CHART_NAME_1}" $(MAKE) helm
+	CMD="package ${CHART_PATH}/${CHART_NAME_1} -d ${CHART_PATH}/.packaged --version ${CHART_VERSION_1}" $(MAKE) helm
 
 chart2:
-	helm dep up ${CHART_PATH}/${CHART_NAME_2}
-	helm package ${CHART_PATH}/${CHART_NAME_2} -d ${CHART_PATH}/.packaged --version ${CHART_VERSION_2}
+	CMD="dep up ${CHART_PATH}/${CHART_NAME_2}" $(MAKE) helm
+	CMD="package ${CHART_PATH}/${CHART_NAME_2} -d ${CHART_PATH}/.packaged --version ${CHART_VERSION_2}" $(MAKE) helm
 
 chart1_test:
-	helm lint "${CHART_PATH}/${CHART_NAME_1}"
+	CMD="lint ${CHART_PATH}/${CHART_NAME_1}" $(MAKE) helm
 	docker run --rm -v ${PWD}/${CHART_PATH}:/apps ${HELM_UNITTEST_IMAGE} -3 ${CHART_NAME_1}
 
 chart2_test:
-	helm lint "${CHART_PATH}/${CHART_NAME_2}"
+	CMD="lint ${CHART_PATH}/${CHART_NAME_2}" $(MAKE) helm
 	docker run --rm -v ${PWD}/${CHART_PATH}:/apps ${HELM_UNITTEST_IMAGE} -3 ${CHART_NAME_2}
