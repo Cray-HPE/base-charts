@@ -67,7 +67,7 @@ spec:
 
   postgresql:
     # This needs to line up with the spilo image in the cray-postgres-operator-chart.
-    version: 14
+    version: "14"
     {{- if .Values.sqlCluster.parameters }}
     {{- with .Values.sqlCluster.parameters }}
     parameters:
