@@ -28,7 +28,6 @@ sqlCluster:
     repository: artifactory.algol60.net/csm-docker/stable/docker.io/library/postgres
     tag: 13.2-alpine
     pullPolicy: IfNotPresent
-  postgresVersion: "11"
   waitForItJob: true
   instanceCount: 3
   volumeSize: 1Gi
