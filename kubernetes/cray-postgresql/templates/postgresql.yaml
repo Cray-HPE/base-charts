@@ -24,6 +24,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 {{- if .Values.sqlCluster.enabled -}}
 {{- $root := . -}}
 ---
+# See also: https://github.com/zalando/postgres-operator/blob/master/docs/reference/cluster_manifest.md
 apiVersion: "acid.zalan.do/v1"
 kind: postgresql
 metadata:
@@ -56,6 +57,9 @@ spec:
     {{- with .Values.sqlCluster.databases -}}
     {{ toYaml . | nindent 4 -}}
     {{- end }}
+
+  enableLogicalBackup: {{ .Values.sqlCluster.enableLogicalBackup }}
+  logicalBackupSchedule: {{ .Values.sqlCluster.logicalBackupSchedule }}
 
   {{- if .Values.sqlCluster.connectionPooler.enabled }}
   enableConnectionPooler: true

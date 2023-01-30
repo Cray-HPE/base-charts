@@ -46,6 +46,8 @@ tests:
       sqlCluster.enabled: true
       fullnameOverride: base-chart-unittest
       sqlCluster.podPriorityClassName: test-csm-high-priority-service
+      sqlCluster.enableLogicalBackup: true
+      sqlCluster.logicalBackupSchedule: "0 1 * * *"
     template: postgresql.yaml
     asserts:
       - equal:
@@ -60,6 +62,12 @@ tests:
       - equal:
           path: spec.podPriorityClassName
           value: test-csm-high-priority-service
+      - equal:
+          path: spec.enableLogicalBackup
+          value: true
+      - equal:
+          path: spec.logicalBackupSchedule
+          value: "0 1 * * *"
   - it: should validate resources
     set:
       sqlCluster.enabled: true

@@ -66,6 +66,9 @@ sqlCluster:
   #   max_connections: "10"
   #   log_statement: "all"
   parameters: {}
+  # Consumers of this chart can enable logical backups on a set schedule:
+  enableLogicalBackup: false
+  logicalBackupSchedule: "0 0 * * *"
 
 global:
   appVersion: ""  # This is set at build time.

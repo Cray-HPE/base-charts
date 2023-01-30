@@ -71,21 +71,3 @@ Convenient way to refer to the boot-services shared IP inside or outside a parti
 {{- printf "boot-services" -}}
 {{- end -}}
 {{- end -}}
-
-{{/*
-Create a default fully qualified name for postgresql DB Backup based on fullname.
-*/}}
-{{- define "cray-postgresql.postgresqlDbBackupFullname" -}}
-{{- printf "%s-postgresql-db-backup" (include "cray-postgresql.fullname" .) -}}
-{{- end -}}
-
-{{/*
-Create the name of the service account to use for the postgres DB Backup
-*/}}
-{{- define "cray-postgresql.postgresqlDbBackupServiceAccountName" -}}
-{{- if .Values.sqlCluster.backup.serviceAccount.create -}}
-    {{ default (include "cray-postgresql.postgresqlDbBackupFullname" .) .Values.sqlCluster.backup.serviceAccount.name }}
-{{- else -}}
-    {{ default "default" .Values.sqlCluster.backup.serviceAccount.name }}
-{{- end -}}
-{{- end -}}
