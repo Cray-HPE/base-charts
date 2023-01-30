@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [10.0.0]
+### Changed
+- Removed the trs worker template
+
 ## [8.3.1]
 ### Changed
 - Updated hopefully last usage of rbac.authorization.k8s.io/v1beta1 api
