@@ -1,0 +1,153 @@
+#
+# MIT License
+#
+# (C) Copyright 2023 Hewlett Packard Enterprise Development LP
+#
+# Permission is hereby granted, free of charge, to any person obtaining a
+# copy of this software and associated documentation files (the "Software"),
+# to deal in the Software without restriction, including without limitation
+# the rights to use, copy, modify, merge, publish, distribute, sublicense,
+# and/or sell copies of the Software, and to permit persons to whom the
+# Software is furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included
+# in all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+# THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+# OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+# ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+# OTHER DEALINGS IN THE SOFTWARE.
+#
+---
+suite: postgresql test
+templates:
+  - postgresql.yaml
+tests:
+  - it: should render 1 document
+    set:
+      sqlCluster.enabled: true
+    asserts:
+      - template: postgresql.yaml
+        hasDocuments:
+          count: 1
+  - it: should be a isKind of postgresql
+    set:
+      sqlCluster.enabled: true
+    asserts:
+      - template: postgresql.yaml
+        documentIndex: 0
+        isKind:
+          of: postgresql
+  - it: should validate asserts
+    set:
+      sqlCluster.enabled: true
+      fullnameOverride: base-chart-unittest
+      sqlCluster.podPriorityClassName: test-csm-high-priority-service
+      sqlCluster.enableLogicalBackup: true
+      sqlCluster.logicalBackupSchedule: "0 1 * * *"
+    template: postgresql.yaml
+    asserts:
+      - equal:
+          path: metadata.name
+          value: base-chart-unittest-postgres
+      - equal:
+          path: spec.volume.size
+          value: 1Gi
+      - equal:
+          path: spec.numberOfInstances
+          value: 3
+      - equal:
+          path: spec.podPriorityClassName
+          value: test-csm-high-priority-service
+      - equal:
+          path: spec.enableLogicalBackup
+          value: true
+      - equal:
+          path: spec.logicalBackupSchedule
+          value: "0 1 * * *"
+  - it: should validate resources
+    set:
+      sqlCluster.enabled: true
+      sqlCluster.resources.limits.cpu: 1
+      sqlCluster.resources.limits.memory: 500Mi
+      sqlCluster.resources.requests.cpu: 100m
+      sqlCluster.resources.requests.memory: 100Mi
+    template: postgresql.yaml
+    asserts:
+      - equal:
+          path: spec.resources.limits.cpu
+          value: 1
+      - equal:
+          path: spec.resources.limits.memory
+          value: 500Mi
+      - equal:
+          path: spec.resources.requests.cpu
+          value: 100m
+      - equal:
+          path: spec.resources.requests.memory
+          value: 100Mi
+  - it: should validate users
+    set:
+      sqlCluster.enabled: true
+      sqlCluster.users.service_account: [test_user1]
+    template: postgresql.yaml
+    asserts:
+      - equal:
+          path: spec.users.service_account[0]
+          value: test_user1
+  - it: should validate databases
+    set:
+      sqlCluster.enabled: true
+      sqlCluster.databases.service_db: test_service_db
+    template: postgresql.yaml
+    asserts:
+      - equal:
+          path: spec.databases.service_db
+          value: test_service_db
+  - it: should validate connectionPooler
+    set:
+      sqlCluster.enabled: true
+      sqlCluster.connectionPooler.enabled: true
+    template: postgresql.yaml
+    asserts:
+      - equal:
+          path: spec.connectionPooler.numberOfInstances
+          value: 3
+      - equal:
+          path: spec.connectionPooler.mode
+          value: session
+      - equal:
+          path: spec.connectionPooler.dockerImage
+          value: artifactory.algol60.net/csm-docker/stable/registry.opensource.zalan.do/acid/pgbouncer:master-21
+  - it: should validate postgresql
+    set:
+      sqlCluster.enabled: true
+      sqlCluster.parameters.shared_buffers: 32MB
+      sqlCluster.parameters.max_connections: 10
+      sqlCluster.parameters.log_statement: all
+    template: postgresql.yaml
+    asserts:
+      - equal:
+          path: spec.postgresql.version
+          value: "14"
+      - equal:
+          path: spec.postgresql.parameters.shared_buffers
+          value: 32MB
+      - equal:
+          path: spec.postgresql.parameters.max_connections
+          value: 10
+      - equal:
+          path: spec.postgresql.parameters.log_statement
+          value: all
+  - it: should validate tls
+    set:
+      sqlCluster.enabled: true
+      fullnameOverride: base-chart-unittest
+    template: postgresql.yaml
+    asserts:
+      - equal:
+          path: spec.tls.secretName
+          value: base-chart-unittest-postgres-tls

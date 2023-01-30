@@ -44,12 +44,14 @@
 CHART_PATH ?= kubernetes
 CHART_NAME_1 ?= cray-service
 CHART_NAME_2 ?= cray-jobs
+CHART_NAME_3 ?= cray-postgresql
 CHART_VERSION_1 ?= local
 CHART_VERSION_2 ?= local
+CHART_VERSION_3 ?= local
 
 HELM_UNITTEST_IMAGE ?= quintush/helm-unittest:3.3.0-0.2.5
 
-charts: chart1 chart2 chart1_test chart2_test
+charts: chart1 chart2 chart3 chart1_test chart2_test chart3_test
 
 chart1:
 	helm dep up ${CHART_PATH}/${CHART_NAME_1}
@@ -59,6 +61,10 @@ chart2:
 	helm dep up ${CHART_PATH}/${CHART_NAME_2}
 	helm package ${CHART_PATH}/${CHART_NAME_2} -d ${CHART_PATH}/.packaged --version ${CHART_VERSION_2}
 
+chart3:
+	helm dep up ${CHART_PATH}/${CHART_NAME_3}
+	helm package ${CHART_PATH}/${CHART_NAME_3} -d ${CHART_PATH}/.packaged --version ${CHART_VERSION_3}
+
 chart1_test:
 	helm lint "${CHART_PATH}/${CHART_NAME_1}"
 	docker run --rm -v ${PWD}/${CHART_PATH}:/apps ${HELM_UNITTEST_IMAGE} -3 ${CHART_NAME_1}
@@ -66,3 +72,7 @@ chart1_test:
 chart2_test:
 	helm lint "${CHART_PATH}/${CHART_NAME_2}"
 	docker run --rm -v ${PWD}/${CHART_PATH}:/apps ${HELM_UNITTEST_IMAGE} -3 ${CHART_NAME_2}
+
+chart3_test:
+	helm lint "${CHART_PATH}/${CHART_NAME_3}"
+	docker run --rm -v ${PWD}/${CHART_PATH}:/apps ${HELM_UNITTEST_IMAGE} -3 ${CHART_NAME_3}

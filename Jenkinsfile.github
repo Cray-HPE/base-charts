@@ -2,7 +2,7 @@
  *
  *  MIT License
  *
- *  (C) Copyright 2022 Hewlett Packard Enterprise Development LP
+ *  (C) Copyright 2022-2023 Hewlett Packard Enterprise Development LP
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a
  *  copy of this software and associated documentation files (the "Software"),
@@ -41,8 +41,10 @@ pipeline {
         IS_STABLE = getBuildIsStable()
         CHART_NAME_1 = "cray-service"
         CHART_NAME_2 = "cray-jobs"
+        CHART_NAME_3 = "cray-postgresql"
         CHART_VERSION_1 = getChartVersion(name: env.CHART_NAME_1, isStable: env.IS_STABLE)
         CHART_VERSION_2 = getChartVersion(name: env.CHART_NAME_2, isStable: env.IS_STABLE)
+        CHART_VERSION_3 = getChartVersion(name: env.CHART_NAME_3, isStable: env.IS_STABLE)
     }
 
     stages {

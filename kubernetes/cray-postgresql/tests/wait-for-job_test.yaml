@@ -1,0 +1,70 @@
+#
+# MIT License
+#
+# (C) Copyright 2023 Hewlett Packard Enterprise Development LP
+#
+# Permission is hereby granted, free of charge, to any person obtaining a
+# copy of this software and associated documentation files (the "Software"),
+# to deal in the Software without restriction, including without limitation
+# the rights to use, copy, modify, merge, publish, distribute, sublicense,
+# and/or sell copies of the Software, and to permit persons to whom the
+# Software is furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included
+# in all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+# THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+# OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+# ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+# OTHER DEALINGS IN THE SOFTWARE.
+#
+---
+suite: wait-for-job test
+templates:
+  - wait-for-job.yaml
+tests:
+  - it: should render 1 document (v1/Job)
+    set:
+      sqlCluster.enabled: true
+    asserts:
+      - template: wait-for-job.yaml
+        hasDocuments:
+          count: 1
+  - it: should validate metadata assertions for the job
+    set:
+      sqlCluster.enabled: true
+      fullnameOverride: base-chart-unittest
+    template: wait-for-job.yaml
+    asserts:
+      - equal:
+          path: metadata.name
+          value: base-chart-unittest-wait-for-postgres-0
+      - equal:
+          path: metadata.labels.app\.kubernetes\.io/name
+          value: base-chart-unittest-wait-for-postgres
+  - it: should validate spec assertions for the job
+    set:
+      sqlCluster.enabled: true
+    template: wait-for-job.yaml
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].name
+          value: postgres-watcher-service-db
+  - it: should validate env var values for the job
+    set:
+      sqlCluster.enabled: true
+      fullnameOverride: base-chart-unittest
+    template: wait-for-job.yaml
+    asserts:
+      - equal: # The expected POSTGRES_USER value
+          path: spec.template.spec.containers[0].env[0].valueFrom.secretKeyRef.name
+          value: service-account.base-chart-unittest-postgres.credentials
+      - equal: # The expected POSTGRES_PASSWORD value
+          path: spec.template.spec.containers[0].env[1].valueFrom.secretKeyRef.name
+          value: service-account.base-chart-unittest-postgres.credentials
+      - equal: # The expected POSTGRES_HOST value
+          path: spec.template.spec.containers[0].env[2].value
+          value: base-chart-unittest-postgres

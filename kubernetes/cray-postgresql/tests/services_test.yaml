@@ -1,0 +1,83 @@
+#
+# MIT License
+#
+# (C) Copyright 2023 Hewlett Packard Enterprise Development LP
+#
+# Permission is hereby granted, free of charge, to any person obtaining a
+# copy of this software and associated documentation files (the "Software"),
+# to deal in the Software without restriction, including without limitation
+# the rights to use, copy, modify, merge, publish, distribute, sublicense,
+# and/or sell copies of the Software, and to permit persons to whom the
+# Software is furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included
+# in all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+# THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+# OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+# ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+# OTHER DEALINGS IN THE SOFTWARE.
+#
+---
+suite: services test
+templates:
+  - services.yaml
+tests:
+  - it: should render 3 documents (v1/Service)
+    set:
+      sqlCluster.enabled: true
+    asserts:
+      - template: services.yaml
+        hasDocuments:
+          count: 3
+  - it: should validate assertions for postgres-0
+    set:
+      sqlCluster.enabled: true
+      fullnameOverride: base-chart-unittest
+    template: services.yaml
+    documentIndex: 0
+    asserts:
+      - equal:
+          path: spec.selector.statefulset\.kubernetes\.io/pod-name
+          value: base-chart-unittest-postgres-0
+      - equal:
+          path: metadata.name
+          value: base-chart-unittest-postgres-0
+      - equal:
+          path: metadata.labels.cluster-name
+          value: base-chart-unittest
+  - it: should validate assertions for postgres-1
+    set:
+      sqlCluster.enabled: true
+      fullnameOverride: base-chart-unittest
+    template: services.yaml
+    documentIndex: 1
+    asserts:
+      - equal:
+          path: spec.selector.statefulset\.kubernetes\.io/pod-name
+          value: base-chart-unittest-postgres-1
+      - equal:
+          path: metadata.name
+          value: base-chart-unittest-postgres-1
+      - equal:
+          path: metadata.labels.cluster-name
+          value: base-chart-unittest
+  - it: should validate assertions for postgres-2
+    set:
+      sqlCluster.enabled: true
+      fullnameOverride: base-chart-unittest
+    template: services.yaml
+    documentIndex: 2
+    asserts:
+      - equal:
+          path: spec.selector.statefulset\.kubernetes\.io/pod-name
+          value: base-chart-unittest-postgres-2
+      - equal:
+          path: metadata.name
+          value: base-chart-unittest-postgres-2
+      - equal:
+          path: metadata.labels.cluster-name
+          value: base-chart-unittest
