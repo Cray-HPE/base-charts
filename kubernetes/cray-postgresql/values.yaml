@@ -78,3 +78,9 @@ global:
   chart:
     name: ""  # set at deploy time automatically, no need to ever set explicitly
     version: ""  # set at deploy time automatically, no need to ever set explicitly
+
+# Needed for remove-backup-cronjob.yaml job
+kubectl:
+  image:
+    repository: artifactory.algol60.net/csm-docker/stable/docker-kubectl
+    tag: 1.19.15
