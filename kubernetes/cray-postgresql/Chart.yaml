@@ -22,7 +22,7 @@
 # OTHER DEALINGS IN THE SOFTWARE.
 #
 apiVersion: v2
-version: 1.0.0
+version: 1.1.0
 name: cray-postgresql
 description: Cray-specific parent chart for PostgreSql
 keywords:
@@ -30,7 +30,7 @@ keywords:
 home: https://github.com/Cray-HPE/base-charts
 maintainers:
   - name: rnoska-hpe
-appVersion: "1.0.0"
+appVersion: "14.0.0" # postgresql
 annotations:
   artifacthub.io/license: MIT
   artifacthub.io/images: |
