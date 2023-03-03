@@ -29,7 +29,7 @@ OTHER DEALINGS IN THE SOFTWARE.
   env:
     {{- if .Root.Values.etcdWaitContainer }}
     - name: ETCD_HOST
-      value: "{{ include "cray-service.name" .Root }}-etcd"
+      value: "{{ include "cray-service.name" .Root }}-bitnami-etcd"
     - name: ETCD_PORT
       value: "2379"
     {{- end }}

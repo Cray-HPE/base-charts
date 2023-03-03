@@ -39,7 +39,7 @@ tests:
       - template: deployment.yaml
         equal:
           path: spec.template.spec.containers[0].env[0].value
-          value: cray-service-etcd
+          value: cray-service-bitnami-etcd
       - template: deployment.yaml
         equal:
           path: spec.template.spec.containers[0].env[1].value
