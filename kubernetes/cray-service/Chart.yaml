@@ -23,7 +23,7 @@
 #
 apiVersion: v2
 name: cray-service
-version: 10.0.1
+version: 10.0.2
 description: This chart should never be installed directly, base your specific Cray service charts off this one
 home: https://github.com/Cray-HPE/base-charts
 maintainers:
