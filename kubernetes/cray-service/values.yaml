@@ -187,7 +187,7 @@ service:
 # https://github.com/Cray-HPE/cray-etcd/tree/master/charts/cray-etcd-base
 #
 etcdWaitContainer: false
-  
+
 # A list of sealedSecrets passed in to be deployed.
 sealedSecrets: []
 # Whether or not to mount secrets as volumeMounts to containers

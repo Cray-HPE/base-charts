@@ -5,7 +5,7 @@ An InitContainer spec that waits for job completion
 - name: "{{.JobName }}"
   image: {{ .Root.Values.kubectl.image.repository }}:{{ .Root.Values.kubectl.image.tag }}
   imagePullPolicy: {{ .Root.Values.kubectl.image.pullPolicy }}
-  command: 
+  command:
     - /bin/sh
     - -c
     - |

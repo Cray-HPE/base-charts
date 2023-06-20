@@ -26,7 +26,7 @@ suite: certificate test
 templates:
   - certificate.yaml
 tests:
-  - it: should render 1 document 
+  - it: should render 1 document
     set:
       sqlCluster.enabled: true
       sqlCluster.tls.enabled: true
