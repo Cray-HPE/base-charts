@@ -24,4 +24,4 @@
 chart-dirs:
 - kubernetes
 additional-commands:
-  - helm unittest --helm3 --strict {{ .Path }}
+  - helm unittest --strict {{ .Path }}
