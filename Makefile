@@ -49,7 +49,7 @@ CHART_VERSION_1 ?= local
 CHART_VERSION_2 ?= local
 CHART_VERSION_3 ?= local
 
-HELM_UNITTEST_IMAGE ?= quintush/helm-unittest:3.3.0-0.2.5
+HELM_UNITTEST_IMAGE ?= quintush/helm-unittest:latest
 
 charts: chart1 chart2 chart3 chart1_test chart2_test chart3_test
 

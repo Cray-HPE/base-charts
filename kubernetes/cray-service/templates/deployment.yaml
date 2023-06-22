@@ -37,9 +37,6 @@ spec:
   strategy:
     {{ toYaml .Values.strategy | nindent 4 }}
     {{- if eq (.Values.strategy.type | lower) "recreate" }}
-    # Need an explicit rollingUpdate: null to upgrade from default RollingUpdate
-    # strategy or K8S API Server will reject the merged deployment
-    rollingUpdate: null
     {{- end }}
 {{- end }}
   selector:

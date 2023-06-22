@@ -38,6 +38,8 @@ initContainers:
   {{- $commonContainer := dict "Root" $root "Container" $initContainer }}
   {{- include "cray-service.common-container" $commonContainer }}
 {{- end -}}
+{{- else }}
+initContainers: {}
 {{- end }}
 containers:
 {{- range $index, $container := .Values.containers }}
@@ -84,20 +86,36 @@ volumes:
 {{- end -}}
 {{/* end volumes */}}
 
+{{- if .Values.nodeSelector }}
 {{- with .Values.nodeSelector }}
 nodeSelector:
   {{- toYaml . | nindent 2 }}
 {{- end -}}
+{{- else }}
+nodeSelector: {}
+{{- end }}
+{{- if .Values.affinity }}
 {{- with .Values.affinity }}
 affinity:
   {{- toYaml . | nindent 2 }}
 {{- end -}}
+{{- else }}
+affinity: {}
+{{- end }}
+{{- if .Values.tolerations }}
 {{- with .Values.tolerations }}
 tolerations:
   {{- toYaml . | nindent 2 }}
 {{- end -}}
+{{- else }}
+tolerations: {}
+{{- end }}
+{{- if .Values.imagePullSecrets }}
 {{- with .Values.imagePullSecrets }}
 imagePullSecrets:
   {{- toYaml . | nindent 2 }}
 {{- end -}}
+{{- else }}
+imagePullSecrets: {}
+{{- end }}
 {{- end -}}

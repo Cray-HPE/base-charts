@@ -115,6 +115,21 @@ OTHER DEALINGS IN THE SOFTWARE.
   {{- if .Container.securityContext }}
   securityContext:
     {{- toYaml .Container.securityContext | nindent 4 -}}
+    {{- if .Container.securityContext.runAsUser }}
+    runAsUser: .Container.securityContext.runAsUser
+    {{- else }}
+    runAsUser: null
+    {{- end }}
+    {{- if .Container.securityContext.runAsGroup }}
+    runAsGroup: .Container.securityContext.runAsGroup
+    {{- else }}
+    runAsGroup: null
+    {{- end }}
+    {{- if .Container.securityContext.runAsNonRoot }}
+    runAsNonRoot: .Container.securityContext.runAsNonRoot
+    {{- else }}
+    runAsNonRoot: null
+    {{- end }}
   {{- else }}
   securityContext:
     runAsUser: {{ .Root.Values.nobodyUserId }}
