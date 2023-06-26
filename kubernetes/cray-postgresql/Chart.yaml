@@ -22,7 +22,7 @@
 # OTHER DEALINGS IN THE SOFTWARE.
 #
 apiVersion: v1
-version: 1.0.0
+version: 1.0.1
 name: cray-postgresql
 description: Cray-specific parent chart for PostgreSql
 keywords:
