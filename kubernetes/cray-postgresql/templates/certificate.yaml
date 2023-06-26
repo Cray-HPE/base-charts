@@ -25,7 +25,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 {{- $root := . -}}
 {{- if .Values.sqlCluster.tls.enabled -}}
 ---
-apiVersion: cert-manager.io/v1alpha2
+apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
   name: "{{ include "cray-postgresql.fullname" $root }}-postgres-tls"
@@ -37,9 +37,10 @@ spec:
     - Cray
   commonName: "{{ include "cray-postgresql.fullname" $root }}-postgres.{{ .Release.Namespace }}.cluster.svc"
   isCA: false
-  keySize: 2048
-  keyAlgorithm: rsa
-  keyEncoding: pkcs1
+  key:
+    algorithm: rsa
+    encoding: pkcs1
+    size: 2048
   usages:
     - server auth
     - client auth
