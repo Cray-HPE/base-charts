@@ -21,7 +21,7 @@
 # ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 # OTHER DEALINGS IN THE SOFTWARE.
 #
-apiVersion: v1
+apiVersion: v2
 name: cray-jobs
 version: 1.0.1
 description: This chart should never be installed directly, use it as a subchart in any chart that has related jobs it needs to run/maintain
