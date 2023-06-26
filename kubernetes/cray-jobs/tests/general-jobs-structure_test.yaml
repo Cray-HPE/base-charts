@@ -1,7 +1,7 @@
 #
 # MIT License
 #
-# (C) Copyright 2022 Hewlett Packard Enterprise Development LP
+# (C) Copyright 2022-2023 Hewlett Packard Enterprise Development LP
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -63,7 +63,7 @@ tests:
       - template: jobs.yaml
         documentIndex: 0
         equal:
-          path: metadata.annotations.[helm.sh/hook]
+          path: metadata.annotations["helm.sh/hook"]
           value: pre-install,pre-upgrade
       - template: jobs.yaml
         documentIndex: 0
@@ -73,7 +73,7 @@ tests:
       - template: jobs.yaml
         documentIndex: 0
         equal:
-          path: metadata.annotations.[helm.sh/hook-delete-policy]
+          path: metadata.annotations["helm.sh/hook-delete-policy"]
           value: hook-succeeded
       - template: jobs.yaml
         documentIndex: 1
@@ -130,7 +130,7 @@ tests:
       - template: jobs.yaml
         documentIndex: 0
         equal:
-          path: metadata.annotations.[helm.sh/hook-delete-policy]
+          path: metadata.annotations["helm.sh/hook-delete-policy"]
           value: before-hook-creation
       - template: jobs.yaml
         documentIndex: 0

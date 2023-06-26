@@ -1,7 +1,7 @@
 #
 # MIT License
 #
-# (C) Copyright 2022 Hewlett Packard Enterprise Development LP
+# (C) Copyright 2022-2023 Hewlett Packard Enterprise Development LP
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -64,27 +64,27 @@ tests:
   - it: should not include any init containers
     asserts:
       - template: deployment.yaml
-        isEmpty:
+        isNull:
           path: spec.template.spec.initContainers
   - it: should not include nodeSelector
     asserts:
       - template: deployment.yaml
-        isEmpty:
+        isNull:
           path: spec.template.spec.nodeSelector
   - it: should not include affinity
     asserts:
       - template: deployment.yaml
-        isEmpty:
+        isNull:
           path: spec.template.spec.affinity
   - it: should not include tolerations
     asserts:
       - template: deployment.yaml
-        isEmpty:
+        isNull:
           path: spec.template.spec.tolerations
   - it: should not include imagePullSecrets
     asserts:
       - template: deployment.yaml
-        isEmpty:
+        isNull:
           path: spec.template.spec.imagePullSecrets
   - it: pod annotations should not be empty
     asserts:

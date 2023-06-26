@@ -41,7 +41,7 @@ tests:
     documentIndex: 0
     asserts:
       - equal:
-          path: spec.selector.statefulset\.kubernetes\.io/pod-name
+          path: spec.selector["statefulset.kubernetes.io/pod-name"]
           value: base-chart-unittest-postgres-0
       - equal:
           path: metadata.name
@@ -57,7 +57,7 @@ tests:
     documentIndex: 1
     asserts:
       - equal:
-          path: spec.selector.statefulset\.kubernetes\.io/pod-name
+          path: spec.selector["statefulset.kubernetes.io/pod-name"]
           value: base-chart-unittest-postgres-1
       - equal:
           path: metadata.name
@@ -73,7 +73,7 @@ tests:
     documentIndex: 2
     asserts:
       - equal:
-          path: spec.selector.statefulset\.kubernetes\.io/pod-name
+          path: spec.selector["statefulset.kubernetes.io/pod-name"]
           value: base-chart-unittest-postgres-2
       - equal:
           path: metadata.name

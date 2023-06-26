@@ -1,7 +1,7 @@
 #
 # MIT License
 #
-# (C) Copyright 2020-2022 Hewlett Packard Enterprise Development LP
+# (C) Copyright 2020-2023 Hewlett Packard Enterprise Development LP
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -267,17 +267,14 @@ tests:
           value: false
       # The default values aren't rendered.
       - template: deployment.yaml
-        equal:
+        isNull:
           path: spec.template.spec.containers[0].securityContext.runAsUser
-          value: null
       - template: deployment.yaml
-        equal:
+        isNull:
           path: spec.template.spec.containers[0].securityContext.runAsGroup
-          value: null
       - template: deployment.yaml
-        equal:
+        isNull:
           path: spec.template.spec.containers[0].securityContext.runAsNonRoot
-          value: null
   - it: should render the correct stdin values, termination message path, tty, and workingDir
     set:
       containers:

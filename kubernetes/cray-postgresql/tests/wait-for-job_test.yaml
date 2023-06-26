@@ -43,7 +43,7 @@ tests:
           path: metadata.name
           value: base-chart-unittest-wait-for-postgres-0
       - equal:
-          path: metadata.labels.app\.kubernetes\.io/name
+          path: metadata.labels["app.kubernetes.io/name"]
           value: base-chart-unittest-wait-for-postgres
   - it: should validate spec assertions for the job
     set:

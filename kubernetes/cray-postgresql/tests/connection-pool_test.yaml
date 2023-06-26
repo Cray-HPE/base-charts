@@ -46,7 +46,7 @@ tests:
           path: metadata.name
           value: base-chart-unittest-postgres-sqlscripts
       - equal:
-          path: metadata.labels.app\.kubernetes\.io/name
+          path: metadata.labels["app.kubernetes.io/name"]
           value: base-chart-unittest-postgres
       - isKind:
           of: ConfigMap
@@ -62,7 +62,7 @@ tests:
           path: metadata.name
           value: base-chart-unittest-create-pooler-schema-0
       - equal:
-          path: metadata.labels.app\.kubernetes\.io/name
+          path: metadata.labels["app.kubernetes.io/name"]
           value: base-chart-unittest-create-pooler-schema
       - isKind:
           of: Job
