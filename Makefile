@@ -49,7 +49,7 @@ CHART_VERSION_1 ?= local
 CHART_VERSION_2 ?= local
 CHART_VERSION_3 ?= local
 
-HELM_UNITTEST_IMAGE ?= quintush/helm-unittest:3.3.0-0.2.5
+HELM_UNITTEST_IMAGE ?= artifactory.algol60.net/csm-docker/stable/docker.io/quintush/helm-unittest:latest
 
 charts: chart1 chart2 chart3 chart1_test chart2_test chart3_test
 
@@ -67,12 +67,24 @@ chart3:
 
 chart1_test:
 	helm lint "${CHART_PATH}/${CHART_NAME_1}"
-	docker run --rm -v ${PWD}/${CHART_PATH}:/apps ${HELM_UNITTEST_IMAGE} ${CHART_NAME_1}
+	docker run --rm \
+		--user $(shell id -u):$(shell id -g) \
+		-v ${PWD}/${CHART_PATH}:/apps \
+		${HELM_UNITTEST_IMAGE} \
+		${CHART_NAME_1}
 
 chart2_test:
 	helm lint "${CHART_PATH}/${CHART_NAME_2}"
-	docker run --rm -v ${PWD}/${CHART_PATH}:/apps ${HELM_UNITTEST_IMAGE} ${CHART_NAME_2}
+	docker run --rm \
+		--user $(shell id -u):$(shell id -g) \
+		-v ${PWD}/${CHART_PATH}:/apps \
+		${HELM_UNITTEST_IMAGE} \
+		${CHART_NAME_2}
 
 chart3_test:
 	helm lint "${CHART_PATH}/${CHART_NAME_3}"
-	docker run --rm -v ${PWD}/${CHART_PATH}:/apps ${HELM_UNITTEST_IMAGE} ${CHART_NAME_3}
+	docker run --rm \
+		--user $(shell id -u):$(shell id -g) \
+		-v ${PWD}/${CHART_PATH}:/apps \
+		${HELM_UNITTEST_IMAGE} \
+		${CHART_NAME_3}
