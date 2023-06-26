@@ -38,20 +38,19 @@ tests:
       - template: deployment.yaml
         isNull:
           path: spec.strategy.rollingUpdate
-  # TODO: fixme
-  # - it: should set update strategy to Recreate (user provides null rollingUpdate)
-  #   set:
-  #     strategy:
-  #       type: Recreate
-  #       rollingUpdate: null
-  #   asserts:
-  #     - template: deployment.yaml
-  #       equal:
-  #         path: spec.strategy.type
-  #         value: Recreate
-  #     - template: deployment.yaml
-  #       isNull:
-  #         path: spec.strategy.rollingUpdate
+  - it: should set update strategy to Recreate (user provides null rollingUpdate)
+    set:
+      strategy:
+        type: Recreate
+        rollingUpdate: null
+    asserts:
+      - template: deployment.yaml
+        equal:
+          path: spec.strategy.type
+          value: Recreate
+      - template: deployment.yaml
+        isNull:
+          path: spec.strategy.rollingUpdate
   - it: should set maxSurge
     set:
       strategy:

@@ -33,52 +33,51 @@ tests:
       - template: services.yaml
         hasDocuments:
           count: 3
-  # TODO: fixme
-  # - it: should validate assertions for postgres-0
-  #   set:
-  #     sqlCluster.enabled: true
-  #     fullnameOverride: base-chart-unittest
-  #   template: services.yaml
-  #   documentIndex: 0
-  #   asserts:
-  #     - equal:
-  #         path: spec.selector.statefulset\.kubernetes\.io/pod-name
-  #         value: base-chart-unittest-postgres-0
-  #     - equal:
-  #         path: metadata.name
-  #         value: base-chart-unittest-postgres-0
-  #     - equal:
-  #         path: metadata.labels.cluster-name
-  #         value: base-chart-unittest
-  # - it: should validate assertions for postgres-1
-  #   set:
-  #     sqlCluster.enabled: true
-  #     fullnameOverride: base-chart-unittest
-  #   template: services.yaml
-  #   documentIndex: 1
-  #   asserts:
-  #     - equal:
-  #         path: spec.selector.statefulset\.kubernetes\.io/pod-name
-  #         value: base-chart-unittest-postgres-1
-  #     - equal:
-  #         path: metadata.name
-  #         value: base-chart-unittest-postgres-1
-  #     - equal:
-  #         path: metadata.labels.cluster-name
-  #         value: base-chart-unittest
-  # - it: should validate assertions for postgres-2
-  #   set:
-  #     sqlCluster.enabled: true
-  #     fullnameOverride: base-chart-unittest
-  #   template: services.yaml
-  #   documentIndex: 2
-  #   asserts:
-  #     - equal:
-  #         path: spec.selector.statefulset\.kubernetes\.io/pod-name
-  #         value: base-chart-unittest-postgres-2
-  #     - equal:
-  #         path: metadata.name
-  #         value: base-chart-unittest-postgres-2
-  #     - equal:
-  #         path: metadata.labels.cluster-name
-  #         value: base-chart-unittest
+  - it: should validate assertions for postgres-0
+    set:
+      sqlCluster.enabled: true
+      fullnameOverride: base-chart-unittest
+    template: services.yaml
+    documentIndex: 0
+    asserts:
+      - equal:
+          path: spec.selector.statefulset\.kubernetes\.io/pod-name
+          value: base-chart-unittest-postgres-0
+      - equal:
+          path: metadata.name
+          value: base-chart-unittest-postgres-0
+      - equal:
+          path: metadata.labels.cluster-name
+          value: base-chart-unittest
+  - it: should validate assertions for postgres-1
+    set:
+      sqlCluster.enabled: true
+      fullnameOverride: base-chart-unittest
+    template: services.yaml
+    documentIndex: 1
+    asserts:
+      - equal:
+          path: spec.selector.statefulset\.kubernetes\.io/pod-name
+          value: base-chart-unittest-postgres-1
+      - equal:
+          path: metadata.name
+          value: base-chart-unittest-postgres-1
+      - equal:
+          path: metadata.labels.cluster-name
+          value: base-chart-unittest
+  - it: should validate assertions for postgres-2
+    set:
+      sqlCluster.enabled: true
+      fullnameOverride: base-chart-unittest
+    template: services.yaml
+    documentIndex: 2
+    asserts:
+      - equal:
+          path: spec.selector.statefulset\.kubernetes\.io/pod-name
+          value: base-chart-unittest-postgres-2
+      - equal:
+          path: metadata.name
+          value: base-chart-unittest-postgres-2
+      - equal:
+          path: metadata.labels.cluster-name
+          value: base-chart-unittest

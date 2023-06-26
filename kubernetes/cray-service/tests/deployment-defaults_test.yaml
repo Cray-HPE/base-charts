@@ -56,37 +56,36 @@ tests:
       - template: pvcs.yaml
         hasDocuments:
           count: 0
-  # TODO: fixme
-  # - it: should not include containers
-  #   asserts:
-  #     - template: deployment.yaml
-  #       isEmpty:
-  #         path: spec.template.spec.containers
-  # - it: should not include any init containers
-  #   asserts:
-  #     - template: deployment.yaml
-  #       isEmpty:
-  #         path: spec.template.spec.initContainers
-  # - it: should not include nodeSelector
-  #   asserts:
-  #     - template: deployment.yaml
-  #       isEmpty:
-  #         path: spec.template.spec.nodeSelector
-  # - it: should not include affinity
-  #   asserts:
-  #     - template: deployment.yaml
-  #       isEmpty:
-  #         path: spec.template.spec.affinity
-  # - it: should not include tolerations
-  #   asserts:
-  #     - template: deployment.yaml
-  #       isEmpty:
-  #         path: spec.template.spec.tolerations
-  # - it: should not include imagePullSecrets
-  #   asserts:
-  #     - template: deployment.yaml
-  #       isEmpty:
-  #         path: spec.template.spec.imagePullSecrets
+  - it: should not include containers
+    asserts:
+      - template: deployment.yaml
+        isEmpty:
+          path: spec.template.spec.containers
+  - it: should not include any init containers
+    asserts:
+      - template: deployment.yaml
+        isEmpty:
+          path: spec.template.spec.initContainers
+  - it: should not include nodeSelector
+    asserts:
+      - template: deployment.yaml
+        isEmpty:
+          path: spec.template.spec.nodeSelector
+  - it: should not include affinity
+    asserts:
+      - template: deployment.yaml
+        isEmpty:
+          path: spec.template.spec.affinity
+  - it: should not include tolerations
+    asserts:
+      - template: deployment.yaml
+        isEmpty:
+          path: spec.template.spec.tolerations
+  - it: should not include imagePullSecrets
+    asserts:
+      - template: deployment.yaml
+        isEmpty:
+          path: spec.template.spec.imagePullSecrets
   - it: pod annotations should not be empty
     asserts:
       - template: deployment.yaml

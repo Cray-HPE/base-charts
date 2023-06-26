@@ -26,71 +26,70 @@ suite: jobs should render as expected
 templates:
   - jobs.yaml
 tests:
-  # TODO: fixme
-  # - it: 01 - should render the correct spec values at all levels
-  #   values:
-  #     - ./values-01.yaml
-  #   asserts:
-  #     - template: jobs.yaml
-  #       documentIndex: 0
-  #       equal:
-  #         path: metadata.name
-  #         value: RELEASE-NAME-cray-jobs-job01
-  #     - template: jobs.yaml
-  #       documentIndex: 0
-  #       equal:
-  #         path: spec.parallelism
-  #         value: 5
-  #     - template: jobs.yaml
-  #       documentIndex: 0
-  #       equal:
-  #         path: spec.template.spec.containers[0].name
-  #         value: container01
-  #     - template: jobs.yaml
-  #       documentIndex: 0
-  #       equal:
-  #         path: spec.template.spec.containers[0].command[0]
-  #         value: test-command
-  #     - template: jobs.yaml
-  #       documentIndex: 0
-  #       equal:
-  #         path: spec.template.spec.containers[0].image
-  #         value: job01:latest
-  #     - template: jobs.yaml
-  #       documentIndex: 0
-  #       equal:
-  #         path: spec.template.spec.containers[0].imagePullPolicy
-  #         value: Never
-  #     - template: jobs.yaml
-  #       documentIndex: 0
-  #       equal:
-  #         path: metadata.annotations.[helm.sh/hook]
-  #         value: pre-install,pre-upgrade
-  #     - template: jobs.yaml
-  #       documentIndex: 0
-  #       equal:
-  #         path: spec.template.spec.restartPolicy
-  #         value: OnFailure
-  #     - template: jobs.yaml
-  #       documentIndex: 0
-  #       equal:
-  #         path: metadata.annotations.[helm.sh/hook-delete-policy]
-  #         value: hook-succeeded
-  #     - template: jobs.yaml
-  #       documentIndex: 1
-  #       matchRegex:
-  #         path: metadata.name
-  #         pattern: ^RELEASE-NAME-cray-jobs-job02-[0-9]+$
-  #     - template: jobs.yaml
-  #       documentIndex: 1
-  #       equal:
-  #         path: spec.template.spec.containers[0].image
-  #         value: job02:latest
-  #     - template: jobs.yaml
-  #       documentIndex: 1
-  #       equal:
-  #         path: spec.template.spec.containers[0].imagePullPolicy
-  #         value: Always
+  - it: 01 - should render the correct spec values at all levels
+    values:
+      - ./values-01.yaml
+    asserts:
+      - template: jobs.yaml
+        documentIndex: 0
+        equal:
+          path: metadata.name
+          value: RELEASE-NAME-cray-jobs-job01
+      - template: jobs.yaml
+        documentIndex: 0
+        equal:
+          path: spec.parallelism
+          value: 5
+      - template: jobs.yaml
+        documentIndex: 0
+        equal:
+          path: spec.template.spec.containers[0].name
+          value: container01
+      - template: jobs.yaml
+        documentIndex: 0
+        equal:
+          path: spec.template.spec.containers[0].command[0]
+          value: test-command
+      - template: jobs.yaml
+        documentIndex: 0
+        equal:
+          path: spec.template.spec.containers[0].image
+          value: job01:latest
+      - template: jobs.yaml
+        documentIndex: 0
+        equal:
+          path: spec.template.spec.containers[0].imagePullPolicy
+          value: Never
+      - template: jobs.yaml
+        documentIndex: 0
+        equal:
+          path: metadata.annotations.[helm.sh/hook]
+          value: pre-install,pre-upgrade
+      - template: jobs.yaml
+        documentIndex: 0
+        equal:
+          path: spec.template.spec.restartPolicy
+          value: OnFailure
+      - template: jobs.yaml
+        documentIndex: 0
+        equal:
+          path: metadata.annotations.[helm.sh/hook-delete-policy]
+          value: hook-succeeded
+      - template: jobs.yaml
+        documentIndex: 1
+        matchRegex:
+          path: metadata.name
+          pattern: ^RELEASE-NAME-cray-jobs-job02-[0-9]+$
+      - template: jobs.yaml
+        documentIndex: 1
+        equal:
+          path: spec.template.spec.containers[0].image
+          value: job02:latest
+      - template: jobs.yaml
+        documentIndex: 1
+        equal:
+          path: spec.template.spec.containers[0].imagePullPolicy
+          value: Always
   - it: 02 - should render with respect to global.appVersion
     values:
       - ./values-02.yaml
@@ -124,18 +123,17 @@ tests:
         equal:
           path: spec.template.spec.restartPolicy
           value: Never
-  # TODO: fixme
-  # - it: 04 - should render default helm.sh/hook-delete-policy as before-hook-creation
-  #   values:
-  #     - ./values-04.yaml
-  #   asserts:
-  #     - template: jobs.yaml
-  #       documentIndex: 0
-  #       equal:
-  #         path: metadata.annotations.[helm.sh/hook-delete-policy]
-  #         value: before-hook-creation
-  #     - template: jobs.yaml
-  #       documentIndex: 0
-  #       equal:
-  #         path: spec.template.spec.containers[0].image
-  #         value: job01:0.0.1
+  - it: 04 - should render default helm.sh/hook-delete-policy as before-hook-creation
+    values:
+      - ./values-04.yaml
+    asserts:
+      - template: jobs.yaml
+        documentIndex: 0
+        equal:
+          path: metadata.annotations.[helm.sh/hook-delete-policy]
+          value: before-hook-creation
+      - template: jobs.yaml
+        documentIndex: 0
+        equal:
+          path: spec.template.spec.containers[0].image
+          value: job01:0.0.1
