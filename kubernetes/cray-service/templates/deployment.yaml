@@ -1,7 +1,7 @@
 {{/*
 MIT License
 
-(C) Copyright 2022 Hewlett Packard Enterprise Development LP
+(C) Copyright 2022-2023 Hewlett Packard Enterprise Development LP
 
 Permission is hereby granted, free of charge, to any person obtaining a
 copy of this software and associated documentation files (the "Software"),
@@ -36,7 +36,7 @@ spec:
 {{- if .Values.strategy }}
   strategy:
     {{ toYaml .Values.strategy | nindent 4 }}
-    {{- if eq (.Values.strategy.type | lower) "recreate" }}
+    {{- if and (eq (.Values.strategy.type | lower) "recreate") (not (hasKey .Values.strategy "rollingUpdate")) }}
     # Need an explicit rollingUpdate: null to upgrade from default RollingUpdate
     # strategy or K8S API Server will reject the merged deployment
     rollingUpdate: null
