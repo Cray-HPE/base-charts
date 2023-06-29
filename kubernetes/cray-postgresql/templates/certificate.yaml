@@ -33,14 +33,15 @@ spec:
   secretName: "{{ include "cray-postgresql.fullname" $root }}-postgres-tls"
   duration: 720h
   renewBefore: 24h
-  organization:
-    - Cray
   commonName: "{{ include "cray-postgresql.fullname" $root }}-postgres.{{ .Release.Namespace }}.cluster.svc"
   isCA: false
-  key:
-    algorithm: rsa
-    encoding: pkcs1
+  privateKey:
+    algorithm: RSA
+    encoding: PKCS1
     size: 2048
+  subject:
+    organizations:
+    - Cray
   usages:
     - server auth
     - client auth
