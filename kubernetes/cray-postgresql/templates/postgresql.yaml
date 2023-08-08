@@ -67,6 +67,13 @@ spec:
     numberOfInstances: {{ .Values.sqlCluster.connectionPooler.instanceCount }}
     mode: "{{ .Values.sqlCluster.connectionPooler.mode }}"
     dockerImage: "{{ .Values.sqlCluster.connectionPooler.image }}"
+    resources:
+      requests:
+        cpu: "{{ .Values.sqlCluster.connectionPooler.resources.requests.cpu }}"
+        memory: "{{ .Values.sqlCluster.connectionPooler.resources.requests.memory }}"
+      limits:
+        cpu: "{{ .Values.sqlCluster.connectionPooler.resources.limits.cpu }}"
+        memory: "{{ .Values.sqlCluster.connectionPooler.resources.limits.memory }}"
   {{- end }}
 
   postgresql:
