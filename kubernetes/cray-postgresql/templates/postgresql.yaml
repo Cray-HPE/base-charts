@@ -89,6 +89,7 @@ spec:
   patroni:
     pg_hba:
     - local   all             all                             trust
+    - local   replication     standby                         trust
     - hostssl all             +zalandos    127.0.0.1/32       pam
     - host    all             all          127.0.0.1/32       md5
     - host    all             all          127.0.0.6/32       md5
