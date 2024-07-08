@@ -34,7 +34,7 @@ annotations:
     - name: busybox
       image: artifactory.algol60.net/csm-docker/stable/docker.io/library/busybox:1.28.0-glibc
     - name: docker-kubectl
-      image: artifactory.algol60.net/csm-docker/stable/docker-kubectl:1.19.15
+      image: artifactory.algol60.net/csm-docker/stable/docker-kubectl:1.24.17
     - name: postgres
       image: artifactory.algol60.net/csm-docker/stable/docker.io/library/postgres:13.2-alpine
     - name: acid/pgbouncer
