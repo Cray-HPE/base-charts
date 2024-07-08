@@ -49,7 +49,7 @@ tests:
       etcdWaitContainer: true
       chart.name: "test-chart"
       kubectl.image.repository: docker-kubectl
-      kubectl.image.tag: 1.19.9
+      kubectl.image.tag: 1.24.17
     asserts:
       - template: deployment.yaml
         equal:
@@ -58,7 +58,7 @@ tests:
       - template: deployment.yaml
         equal:
           path: spec.template.spec.initContainers[0].image
-          value: "docker-kubectl:1.19.9"
+          value: "docker-kubectl:1.24.17"
       - template: deployment.yaml
         equal:
           path: spec.template.spec.serviceAccountName
