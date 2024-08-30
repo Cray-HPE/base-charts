@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [11.0.0]
+### Changed
+- docker-kubectl container version updated to 1.24.17
+
 ## [10.0.0]
 ### Changed
 - Removed the trs worker template
