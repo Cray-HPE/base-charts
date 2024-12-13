@@ -13,7 +13,7 @@ An InitContainer spec that waits for job completion
         JOB_CONDITION="$(kubectl get jobs -n services -l app.kubernetes.io/name={{ .JobName }} -o jsonpath='{.items[0].status.conditions[0].type}')"
         JOB_CONDITION_RC=$?
         if [ $JOB_CONDITION_RC -eq 0 ]; then
-          if [ "$JOB_CONDITION" == 'Complete' ]; then
+          if [ "$JOB_CONDITION" == 'Complete' -o "$JOB_CONDITION" == 'SuccessCriteriaMet' ]; then
             echo "Completed"
             break
           fi
