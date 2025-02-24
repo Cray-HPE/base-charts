@@ -1,7 +1,7 @@
 #
 # MIT License
 #
-# (C) Copyright 2020-2023 Hewlett Packard Enterprise Development LP
+# (C) Copyright 2020-2023, 2025 Hewlett Packard Enterprise Development LP
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -22,17 +22,17 @@
 # OTHER DEALINGS IN THE SOFTWARE.
 #
 apiVersion: v2
-version: 1.0.4
+version: 2.0.0
 name: cray-postgresql
 description: Cray-specific parent chart for PostgreSql
 keywords:
   - cray-postgresql
 home: https://github.com/Cray-HPE/base-charts
 maintainers:
-  - name: rnoska-hpe
-appVersion: "1.0.2"
+  - name: leliasen-hpe
+appVersion: "2.0.0"
 annotations:
   artifacthub.io/license: MIT
   artifacthub.io/images: |
     - name: postgres
-      image: artifactory.algol60.net/csm-docker/stable/docker.io/library/postgres:13.2-alpine
+      image: artifactory.algol60.net/csm-docker/stable/docker.io/library/postgres:15-alpine

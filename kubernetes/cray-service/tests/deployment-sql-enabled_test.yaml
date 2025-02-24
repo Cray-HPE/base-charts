@@ -1,7 +1,7 @@
 #
 # MIT License
 #
-# (C) Copyright 2022 Hewlett Packard Enterprise Development LP
+# (C) Copyright 2022, 2025 Hewlett Packard Enterprise Development LP
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -395,7 +395,7 @@ tests:
     set:
       sqlCluster.enabled: true
       sqlCluster.connectionPooler.enabled: true
-      sqlCluster.connectionPooler.image: pgbouncer:master-21
+      sqlCluster.connectionPooler.image: pgbouncer:master-27
     asserts:
       - template: postgresql.yaml
         documentIndex: 1
@@ -416,4 +416,4 @@ tests:
         documentIndex: 1
         equal:
           path: spec.connectionPooler.dockerImage
-          value: pgbouncer:master-21
+          value: pgbouncer:master-27

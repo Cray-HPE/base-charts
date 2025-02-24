@@ -79,7 +79,7 @@ tests:
           value: postgres-create-pooler-schema-service-db
       - equal:
           path: spec.template.spec.containers[0].image
-          value: artifactory.algol60.net/csm-docker/stable/docker.io/library/postgres:13.2-alpine
+          value: artifactory.algol60.net/csm-docker/stable/docker.io/library/postgres:15-alpine
       - equal:
           path: spec.template.spec.containers[0].imagePullPolicy
           value: IfNotPresent
