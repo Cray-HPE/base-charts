@@ -1,7 +1,7 @@
 #
 # MIT License
 #
-# (C) Copyright 2023 Hewlett Packard Enterprise Development LP
+# (C) Copyright 2023, 2025 Hewlett Packard Enterprise Development LP
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -121,7 +121,7 @@ tests:
           value: session
       - equal:
           path: spec.connectionPooler.dockerImage
-          value: artifactory.algol60.net/csm-docker/stable/registry.opensource.zalan.do/acid/pgbouncer:master-21
+          value: artifactory.algol60.net/csm-docker/stable/registry.opensource.zalan.do/acid/pgbouncer:master-27
   - it: should validate postgresql
     set:
       sqlCluster.enabled: true
@@ -132,7 +132,7 @@ tests:
     asserts:
       - equal:
           path: spec.postgresql.version
-          value: "14"
+          value: "15"
       - equal:
           path: spec.postgresql.parameters.shared_buffers
           value: 32MB

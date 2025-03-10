@@ -3,6 +3,13 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [12.0.0]
+### Changed
+- upgrade postgres image to alpine-15
+- update postgres to match cray-postgres-operator version 15
+- update pgbouncer to master-27
+- remove postgres-db-backup because logical-backup is used
+
 ## [11.0.1]
 ### Changed
 - change the wait_for_job_container to complete if 'SuccessCriteriaMet' job status. Needed for k8s 1.30

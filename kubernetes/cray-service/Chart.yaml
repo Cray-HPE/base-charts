@@ -1,7 +1,7 @@
 #
 # MIT License
 #
-# (C) Copyright [2022-2023] Hewlett Packard Enterprise Development LP
+# (C) Copyright [2022-2023, 2025] Hewlett Packard Enterprise Development LP
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -23,7 +23,7 @@
 #
 apiVersion: v2
 name: cray-service
-version: 11.0.1
+version: 12.0.0
 description: This chart should never be installed directly, base your specific Cray service charts off this one
 home: https://github.com/Cray-HPE/base-charts
 maintainers:
@@ -36,9 +36,7 @@ annotations:
     - name: docker-kubectl
       image: artifactory.algol60.net/csm-docker/stable/docker-kubectl:1.24.17
     - name: postgres
-      image: artifactory.algol60.net/csm-docker/stable/docker.io/library/postgres:13.2-alpine
+      image: artifactory.algol60.net/csm-docker/stable/docker.io/library/postgres:15-alpine
     - name: acid/pgbouncer
-      image: artifactory.algol60.net/csm-docker/stable/registry.opensource.zalan.do/acid/pgbouncer:master-21
-    - name: cray-postgres-db-backup
-      image: artifactory.algol60.net/csm-docker/stable/cray-postgres-db-backup:0.2.3
+      image: artifactory.algol60.net/csm-docker/stable/registry.opensource.zalan.do/acid/pgbouncer:master-27
   artifacthub.io/license: MIT
